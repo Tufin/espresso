@@ -1,0 +1,18 @@
+Name: report_summary
+Requires:
+- Endpoints
+Params:
+- prod_project
+- dev_project
+- start_day
+- end_day
+Tests:
+  Test1:
+    Source: report_summary
+    Args:
+    - Name: Endpoints
+      Source: get_new_endpoints
+      Args:
+      - Name: NewEndpoints
+        Source: new_endpoints_result
+    Result: report_summary_result
