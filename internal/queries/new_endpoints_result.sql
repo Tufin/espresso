@@ -18,7 +18,7 @@
         2 AS hit_count_yesterday,
         # stats yesterday
         2 AS stats_hit_count_yesterday,
-        [STRUCT(2 AS hit_count, "sx-company" AS name)] AS tenants_yesterday,
+        [STRUCT(2 AS hit_count, "acme" AS name)] AS tenants_yesterday,
         [
             STRUCT(1 AS hit_count, "effi" AS name),
             STRUCT(1 AS hit_count, "reuven" AS name)
@@ -29,7 +29,7 @@
         1 AS total_agents_yesterday,
         # stats all
         3 AS stats_hit_count,
-        [STRUCT(3 AS hit_count, "sx-company" AS name)] AS tenants,
+        [STRUCT(3 AS hit_count, "acme" AS name)] AS tenants,
         [
             STRUCT(2 AS hit_count, "effi" AS name),
             STRUCT(1 AS hit_count, "reuven" AS name)
@@ -56,7 +56,7 @@
         1 AS hit_count_yesterday,
         # stats yesterday
         1 AS stats_hit_count_yesterday,
-        [STRUCT(1 AS hit_count, "sx-company" AS name)] AS tenants_yesterday,
+        [STRUCT(1 AS hit_count, "acme" AS name)] AS tenants_yesterday,
         [STRUCT(1 AS hit_count, "effi" AS name)] AS users_yesterday,
         [STRUCT(1 AS hit_count, "Java" AS name)] AS agents_yesterday,
         1 AS total_tenants_yesterday,
@@ -64,7 +64,7 @@
         1 AS total_agents_yesterday,
         # stats all
         1 AS stats_hit_count,
-        [STRUCT(1 AS hit_count, "sx-company" AS name)] AS tenants,
+        [STRUCT(1 AS hit_count, "acme" AS name)] AS tenants,
         [STRUCT(1 AS hit_count, "effi" AS name)] AS users,
         [STRUCT(1 AS hit_count, "Java" AS name)] AS agents,
         1 AS total_tenants,

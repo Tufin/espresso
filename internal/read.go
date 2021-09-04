@@ -1,22 +1,14 @@
 package internal
 
 import (
-	"embed"
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
-	log "github.com/sirupsen/logrus"
 	"github.com/tufin/espresso/bq"
 	"google.golang.org/api/iterator"
 )
 
-func RunSQL(projectID string, fs embed.FS, templateName string) (bq.Iterator, error) {
-	bqClient := bq.NewClient(projectID)
-
-	query, err := generateSQL(fs, templateName, map[string]string{})
-	if err != nil {
-		return nil, err
-	}
+func runSQL(bqClient bq.Client, query string) (bq.Iterator, error) {
 
 	queryIterator, err := bqClient.QueryIterator(query, []bigquery.QueryParameter{})
 	if err != nil {
@@ -26,7 +18,7 @@ func RunSQL(projectID string, fs embed.FS, templateName string) (bq.Iterator, er
 	return queryIterator, nil
 }
 
-func ReadResult(queryIterator bq.Iterator) []map[string]bigquery.Value {
+func readResult(queryIterator bq.Iterator) ([]map[string]bigquery.Value, error) {
 
 	result := []map[string]bigquery.Value{}
 	for {
@@ -36,11 +28,10 @@ func ReadResult(queryIterator bq.Iterator) []map[string]bigquery.Value {
 			if err == iterator.Done {
 				break
 			}
-			err = fmt.Errorf("failed to iterate on with '%v'", err)
-			log.Error(err)
-			continue
+			err = fmt.Errorf("failed to iterate with '%v'", err)
+			return nil, err
 		}
 		result = append(result, row)
 	}
-	return result
+	return result, nil
 }

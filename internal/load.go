@@ -3,28 +3,14 @@ package internal
 import (
 	"bytes"
 	"embed"
-	"fmt"
 	"text/template"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func GetQuery(fs embed.FS, queryName string, testName string) (string, error) {
+func getQuery(fs embed.FS, queryName string, args []Argument) (string, error) {
 
-	metadata, err := getMetadata(fs, queryName)
-	if err != nil {
-		log.Errorf("failed to get metadata with '%v'", err)
-		return "", err
-	}
-
-	test, ok := metadata.Tests[testName]
-	if !ok {
-		err := fmt.Errorf("test '%s' undefined", testName)
-		log.Error(err)
-		return "", err
-	}
-
-	query, err := loadQueryRecursive(fs, test.Source, test.Args)
+	query, err := loadQueryRecursive(fs, queryName, args)
 	if err != nil {
 		log.Errorf("failed to load query with '%v'", err)
 		return "", err

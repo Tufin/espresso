@@ -17,9 +17,8 @@ type Metadata struct {
 }
 
 type Test struct {
-	Source string     `yaml:"Source"`
 	Args   []Argument `yaml:"Args"`
-	Output string     `yaml:"Output"`
+	Result string     `yaml:"Result"`
 }
 
 type Argument struct {

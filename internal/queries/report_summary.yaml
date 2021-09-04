@@ -8,7 +8,6 @@ Params:
 - end_day
 Tests:
   Test1:
-    Source: report_summary
     Args:
     - Name: Endpoints
       Source: get_new_endpoints

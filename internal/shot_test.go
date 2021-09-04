@@ -1,4 +1,4 @@
-package main
+package internal_test
 
 import (
 	"embed"
@@ -6,6 +6,7 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"github.com/tufin/espresso/env"
+	"github.com/tufin/espresso/internal"
 )
 
 //go:embed queries/*.sql queries/*.yaml
@@ -15,6 +16,6 @@ func TestFromEspresso(t *testing.T) {
 
 	// env.Ophiuchus()
 	projectID := env.GetGCPProjectID()
-	shot := NewShot(projectID, sqlTemplates)
-	shot.Run(t, "report_summary", "Test1", []bigquery.QueryParameter{})
+	shot := internal.NewShot(projectID, sqlTemplates)
+	shot.RunTest(t, "report_summary", "Test1", []bigquery.QueryParameter{})
 }
