@@ -1,4 +1,4 @@
-package internal
+package espresso
 
 import (
 	"embed"
@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"github.com/tufin/espresso/bq"
+	"github.com/tufin/espresso/internal"
 )
 
 type Shot struct {
@@ -27,7 +28,7 @@ func NewShot(project string, fs embed.FS) Shot {
 
 func (shot Shot) RunTest(t *testing.T, queryName string, testName string, params []bigquery.QueryParameter) error {
 
-	metadata, err := getMetadata(shot.sqlTemplates, queryName)
+	metadata, err := internal.GetMetadata(shot.sqlTemplates, queryName)
 	if err != nil {
 		log.Errorf("failed to get metadata with '%v'", err)
 		return err
@@ -52,7 +53,7 @@ func (shot Shot) RunTest(t *testing.T, queryName string, testName string, params
 		return err
 	}
 
-	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result, []Argument{})
+	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result, []internal.Argument{})
 	if err != nil {
 		log.Errorf("failed to run result query with '%v'", err)
 		return err
@@ -66,16 +67,16 @@ func (shot Shot) RunTest(t *testing.T, queryName string, testName string, params
 	return nil
 }
 
-func loadAndRun(client bq.Client, fs embed.FS, testName string, args []Argument) ([]map[string]bigquery.Value, error) {
-	query, err := getQuery(fs, testName, args)
+func loadAndRun(client bq.Client, fs embed.FS, testName string, args []internal.Argument) ([]map[string]bigquery.Value, error) {
+	query, err := internal.GetQuery(fs, testName, args)
 	if err != nil {
 		return nil, err
 	}
 
-	queryIterator, err := runSQL(client, query)
+	queryIterator, err := internal.RunQuery(client, query)
 	if err != nil {
 		return nil, err
 	}
 
-	return readResult(queryIterator)
+	return internal.ReadResult(queryIterator)
 }

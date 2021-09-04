@@ -27,7 +27,7 @@ type Argument struct {
 	Args   []Argument `yaml:"Args"`
 }
 
-func getMetadata(fs embed.FS, templateName string) (Metadata, error) {
+func GetMetadata(fs embed.FS, templateName string) (Metadata, error) {
 	var metadata Metadata
 
 	bytes, err := fs.ReadFile(templateDir + "/" + templateName + ".yaml")

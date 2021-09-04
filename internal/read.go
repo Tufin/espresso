@@ -8,7 +8,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func runSQL(bqClient bq.Client, query string) (bq.Iterator, error) {
+func RunQuery(bqClient bq.Client, query string) (bq.Iterator, error) {
 
 	queryIterator, err := bqClient.QueryIterator(query, []bigquery.QueryParameter{})
 	if err != nil {
@@ -18,7 +18,7 @@ func runSQL(bqClient bq.Client, query string) (bq.Iterator, error) {
 	return queryIterator, nil
 }
 
-func readResult(queryIterator bq.Iterator) ([]map[string]bigquery.Value, error) {
+func ReadResult(queryIterator bq.Iterator) ([]map[string]bigquery.Value, error) {
 
 	result := []map[string]bigquery.Value{}
 	for {
