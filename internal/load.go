@@ -2,13 +2,14 @@ package internal
 
 import (
 	"bytes"
-	"embed"
+	"io/fs"
+	"path/filepath"
 	"text/template"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func GetQuery(fs embed.FS, path string, queryName string, args []Argument) (string, error) {
+func GetQuery(fs fs.FS, path string, queryName string, args []Argument) (string, error) {
 
 	query, err := loadQueryRecursive(fs, path, queryName, args)
 	if err != nil {
@@ -19,7 +20,7 @@ func GetQuery(fs embed.FS, path string, queryName string, args []Argument) (stri
 	return query, nil
 }
 
-func loadQueryRecursive(fs embed.FS, path string, source string, args []Argument) (string, error) {
+func loadQueryRecursive(fs fs.FS, path string, source string, args []Argument) (string, error) {
 
 	params := map[string]string{}
 
@@ -34,9 +35,10 @@ func loadQueryRecursive(fs embed.FS, path string, source string, args []Argument
 	return generateSQL(fs, path, source, params)
 }
 
-func generateSQL(fs embed.FS, path string, templateName string, params map[string]string) (string, error) {
+func generateSQL(fs fs.FS, path string, templateName string, params map[string]string) (string, error) {
 
-	t, err := template.New("").ParseFS(fs, path+"/"+templateName+".sql")
+	name := filepath.Join(path, templateName+".sql")
+	t, err := template.New("").ParseFS(fs, name)
 	if err != nil {
 		log.Error(err)
 		return "", err

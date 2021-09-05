@@ -1,24 +1,22 @@
-package espresso
+package shot
 
 import (
-	"embed"
 	"fmt"
-	"testing"
+	"io/fs"
 
 	"cloud.google.com/go/bigquery"
 	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
 	"github.com/tufin/espresso/bq"
 	"github.com/tufin/espresso/internal"
 )
 
 type Shot struct {
 	bqClient     bq.Client
-	sqlTemplates embed.FS
+	sqlTemplates fs.FS
 	projectID    string
 }
 
-func NewShot(project string, fs embed.FS) Shot {
+func NewShot(project string, fs fs.FS) Shot {
 	return Shot{
 		bqClient:     bq.NewClient(project),
 		sqlTemplates: fs,
@@ -26,48 +24,43 @@ func NewShot(project string, fs embed.FS) Shot {
 	}
 }
 
-func (shot Shot) RunTest(t *testing.T, path string, queryName string, testName string, params []bigquery.QueryParameter) error {
+func (shot Shot) RunTest(path string, queryName string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
 
 	metadata, err := internal.GetMetadata(shot.sqlTemplates, path, queryName)
 	if err != nil {
 		log.Errorf("failed to get metadata with '%v'", err)
-		return err
+		return nil, nil, err
 	}
 
 	test, ok := metadata.Tests[testName]
 	if !ok {
 		err := fmt.Errorf("test '%s' undefined", testName)
 		log.Error(err)
-		return err
+		return nil, nil, err
 	}
 
 	client := bq.NewClient(shot.projectID)
 	if err != nil {
 		log.Errorf("failed to create client with '%v'", err)
-		return err
+		return nil, nil, err
 	}
 
 	queryValues, err := loadAndRun(client, shot.sqlTemplates, path, queryName, test.Args)
 	if err != nil {
 		log.Errorf("failed to run query with '%v'", err)
-		return err
+		return nil, nil, err
 	}
 
 	resultValues, err := loadAndRun(client, shot.sqlTemplates, path, test.Result, []internal.Argument{})
 	if err != nil {
 		log.Errorf("failed to run result query with '%v'", err)
-		return err
+		return nil, nil, err
 	}
 
-	require.Equal(t,
-		queryValues,
-		resultValues,
-	)
-
-	return nil
+	return queryValues, resultValues, nil
 }
 
-func loadAndRun(client bq.Client, fs embed.FS, path string, testName string, args []internal.Argument) ([]map[string]bigquery.Value, error) {
+func loadAndRun(client bq.Client, fs fs.FS, path string, testName string, args []internal.Argument) ([]map[string]bigquery.Value, error) {
 	query, err := internal.GetQuery(fs, path, testName, args)
 	if err != nil {
 		return nil, err
