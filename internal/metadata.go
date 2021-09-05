@@ -7,8 +7,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const templateDir = "queries"
-
 type Metadata struct {
 	Name     string          `yaml:"Name"`
 	Requires []string        `yaml:"Requires"`
@@ -27,10 +25,10 @@ type Argument struct {
 	Args   []Argument `yaml:"Args"`
 }
 
-func GetMetadata(fs embed.FS, templateName string) (Metadata, error) {
+func GetMetadata(fs embed.FS, path string, templateName string) (Metadata, error) {
 	var metadata Metadata
 
-	bytes, err := fs.ReadFile(templateDir + "/" + templateName + ".yaml")
+	bytes, err := fs.ReadFile(path + "/" + templateName + ".yaml")
 	if err != nil {
 		log.Error(err)
 		return metadata, err

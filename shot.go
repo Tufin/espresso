@@ -26,9 +26,9 @@ func NewShot(project string, fs embed.FS) Shot {
 	}
 }
 
-func (shot Shot) RunTest(t *testing.T, queryName string, testName string, params []bigquery.QueryParameter) error {
+func (shot Shot) RunTest(t *testing.T, path string, queryName string, testName string, params []bigquery.QueryParameter) error {
 
-	metadata, err := internal.GetMetadata(shot.sqlTemplates, queryName)
+	metadata, err := internal.GetMetadata(shot.sqlTemplates, path, queryName)
 	if err != nil {
 		log.Errorf("failed to get metadata with '%v'", err)
 		return err
@@ -47,13 +47,13 @@ func (shot Shot) RunTest(t *testing.T, queryName string, testName string, params
 		return err
 	}
 
-	queryValues, err := loadAndRun(client, shot.sqlTemplates, queryName, test.Args)
+	queryValues, err := loadAndRun(client, shot.sqlTemplates, path, queryName, test.Args)
 	if err != nil {
 		log.Errorf("failed to run query with '%v'", err)
 		return err
 	}
 
-	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result, []internal.Argument{})
+	resultValues, err := loadAndRun(client, shot.sqlTemplates, path, test.Result, []internal.Argument{})
 	if err != nil {
 		log.Errorf("failed to run result query with '%v'", err)
 		return err
@@ -67,8 +67,8 @@ func (shot Shot) RunTest(t *testing.T, queryName string, testName string, params
 	return nil
 }
 
-func loadAndRun(client bq.Client, fs embed.FS, testName string, args []internal.Argument) ([]map[string]bigquery.Value, error) {
-	query, err := internal.GetQuery(fs, testName, args)
+func loadAndRun(client bq.Client, fs embed.FS, path string, testName string, args []internal.Argument) ([]map[string]bigquery.Value, error) {
+	query, err := internal.GetQuery(fs, path, testName, args)
 	if err != nil {
 		return nil, err
 	}

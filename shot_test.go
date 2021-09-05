@@ -14,8 +14,8 @@ var sqlTemplates embed.FS
 
 func TestFromEspresso(t *testing.T) {
 
-	// env.Ophiuchus()
+	env.Ophiuchus()
 	projectID := env.GetGCPProjectID()
 	shot := espresso.NewShot(projectID, sqlTemplates)
-	shot.RunTest(t, "report_summary", "Test1", []bigquery.QueryParameter{})
+	shot.RunTest(t, "queries", "report_summary", "Test1", []bigquery.QueryParameter{})
 }
