@@ -15,6 +15,11 @@
 4. Create a test definition YAML file decribing your query and tests, for example: [report_summary.yaml](queries/report_summary.yaml)
 5. Put all files in a directory, [create an Espresso Shot and run the test](shot_test.go)
 
+## Access to BigQuery
+Please set the following environment variables to grant espresso access to BigQuery:
+- `export GCLOUD_PROJECT_ID=<your GCP project ID>`
+- `export BIGQUERY_KEY=<a service account with permissions to use BigQuery>`
+
 ## Current Status
 - This is an initial proof-of-concept and request-for-comments
 - Please submit your feedback as pull requests

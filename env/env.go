@@ -6,11 +6,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	KeyDomain  = "TUFIN_DOMAIN"
-	KeyProject = "TUFIN_PROJECT"
-)
-
 func GetEnvWithDefault(variable, defaultValue string) string {
 
 	ret := os.Getenv(variable)
