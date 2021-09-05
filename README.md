@@ -8,12 +8,62 @@
 - Allow the user to run tests in their own development stack incl. programming language, IDE and CI/CD pipeline
 
 ## Writing Your Own SQL Tests
-1. Write an SQL query using Go Text Template notation, for example [report_summary.sql](queries/report_summary.sql).
-   The query can contain parameters.
-2. Add additional SQL queries to pass as paramaters to the main query. These can be data files like [new_endpoints_input.sql](queries/new_endpoints_input.sql) or additional sub-queries like [get_new_endpoints.sql](queries/get_new_endpoints.sql)
-3. Write your result query like [report_summary_result.sql](queries/report_summary_result.sql)
-4. Create a test definition YAML file decribing your query and tests, for example: [report_summary.yaml](queries/report_summary.yaml)
-5. Put all files in a directory
+1. Write an SQL query using Go Text Template notation, for example [report_summary.sql](queries/report_summary.sql):
+   ```
+    {{ define "report_summary" }}
+
+    WITH base AS (
+        SELECT
+            request_method,
+            path,
+            SUM(hit_count_yesterday) AS hit_count_yesterday,
+        FROM {{ .Endpoints }}
+        WHERE status_code<400
+        GROUP BY 
+            request_method,
+            path
+    )
+    SELECT
+        COUNT(*) AS total_endpoints,
+        COUNTIF(hit_count_yesterday>0) AS total_endpoints_yesterday,
+        SUM(hit_count_yesterday) AS hit_count_yesterday,
+    FROM base
+
+    {{ end }}
+   ```
+   The query may contain parameters.
+2. Add additional SQL queries to pass as paramaters to the main query.  
+   These can be data files like [new_endpoints_input.sql](queries/new_endpoints_input.sql) or additional sub-queries like [get_new_endpoints.sql](queries/get_new_endpoints.sql)
+3. Write your result query like [report_summary_result.sql](queries/report_summary_result.sql):
+   ```
+   {{ define "report_summary_result" }}
+
+    (
+        SELECT
+            2 AS hit_count_yesterday,
+            1 AS total_endpoints,
+            1 AS total_endpoints_yesterday,
+    )
+
+    {{ end }}
+   ```
+    The test will expect the result of the test to be equal to this.
+4. Create a test definition YAML file decribing your query and tests like [report_summary.yaml](queries/report_summary.yaml):
+   ```
+   Name: report_summary
+    Requires:
+    - Endpoints
+    Tests:
+      Test1:
+        Args:
+        - Name: Endpoints
+          Source: get_new_endpoints
+          Args:
+          - Name: NewEndpoints
+            Source: new_endpoints_input
+        Result: report_summary_result
+   ```
+5. Put all files together in a directory
 
 ## Running Tests From The Command-line
 ```
@@ -22,7 +72,29 @@ go build
 ````
 
 ## Running Tests From Golang
-[create an Espresso Shot and run the test](shot_test.go)
+1. Embed your tests directory
+2. Create an "Espresso Shot" and run it
+3. Use standard Go assertions to check the output
+```
+//go:embed queries
+var sqlTemplates embed.FS
+
+func TestEspressoShot_Embed(t *testing.T) {
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), sqlTemplates).RunTest("queries", "report_summary", "Test1", []bigquery.QueryParameter{})
+	require.NoError(t, err)
+	require.Equal(t, queryValues, resultValues)
+}
+```
+
+You can also just pass the tests directory without embedding it:
+```
+func TestEspressoShot_Filesystem(t *testing.T) {
+	fileSystem := os.DirFS(".")
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), fileSystem).RunTest("queries", "report_summary", "Test1", []bigquery.QueryParameter{})
+	require.NoError(t, err)
+	require.Equal(t, queryValues, resultValues)
+}
+```
 
 ## Access To BigQuery
 Please set the following environment variables to grant espresso access to BigQuery:

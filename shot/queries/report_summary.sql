@@ -1,4 +1,3 @@
-
 {{ define "report_summary" }}
 
 WITH base AS (
