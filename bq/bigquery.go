@@ -11,23 +11,7 @@ import (
 )
 
 const (
-	GCPProjectID = "ophiuchus"
-
 	EnvKeyBQToken = "BIGQUERY_KEY"
-
-	DatasetIDDev   = "dev"
-	DatasetIDTufin = "tufin"
-
-	TableIDSpecEndpoint         = "spec_endpoint"
-	TableIDNewEndpoint          = "new_endpoint"
-	TableIDStaticFile           = "static_file"
-	TableIDHTTPLog              = "http_log"
-	TableIDCounters             = "counters"
-	TableIDEndpoints            = "endpoints"
-	TableIDInvalidHTTPLog       = "invalid_http_log"
-	TableIDHit                  = "hit"
-	TableIDPathTemplates        = "path_templates"
-	TableSuffixExtractedHTTPLog = "extracted"
 )
 
 type Client interface {
