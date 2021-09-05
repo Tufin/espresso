@@ -8,7 +8,7 @@
 - Allow the user to run tests in their own development stack incl. programming language, IDE and CI/CD pipeline
 
 ## Writing Your Own SQL Tests
-1. Write an SQL query using Go Text Template notation, for example [report_summary.sql](queries/report_summary.sql):
+1. Write an SQL query using Go Text Template notation, for example [report_summary.sql](shot/queries/report_summary.sql):
    ```
     {{ define "report_summary" }}
 
@@ -33,8 +33,8 @@
    ```
    The query may contain parameters.
 2. Add additional SQL queries to pass as paramaters to the main query.  
-   These can be data files like [new_endpoints_input.sql](queries/new_endpoints_input.sql) or additional sub-queries like [get_new_endpoints.sql](queries/get_new_endpoints.sql)
-3. Write your result query like [report_summary_result.sql](queries/report_summary_result.sql):
+   These can be data files like [new_endpoints_input.sql](shot/queries/new_endpoints_input.sql) or additional sub-queries like [get_new_endpoints.sql](shot/queries/get_new_endpoints.sql)
+3. Write your result query like [report_summary_result.sql](shot/queries/report_summary_result.sql):
    ```
    {{ define "report_summary_result" }}
 
@@ -48,7 +48,7 @@
     {{ end }}
    ```
     The test will expect the result of the test to be equal to this.
-4. Create a test definition YAML file decribing your query and tests like [report_summary.yaml](queries/report_summary.yaml):
+4. Create a test definition YAML file decribing your query and tests like [report_summary.yaml](shot/queries/report_summary.yaml):
    ```
    Name: report_summary
     Requires:
