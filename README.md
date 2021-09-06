@@ -68,29 +68,29 @@
 ## Running Tests From The Command-line
 ```
 go build
-./espresso -dir="shot/queries" -query="report_summary" -test="Test1"
+./espresso -dir="shot/queries" -def="report_summary.yaml" -query="report_summary" -test="Test1"
 ````
 
 ## Running Tests From Golang
 1. Embed your tests directory
 2. Create an "Espresso Shot" and run it
-3. Use standard Go assertions to check the output
+3. Use standard Go assertions to check the expected result against the actual output
 ```
 //go:embed queries
 var sqlTemplates embed.FS
 
 func TestEspressoShot_Embed(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), sqlTemplates).RunTest("queries", "report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), sqlTemplates).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t, queryValues, resultValues)
 }
 ```
 
-You can also just pass the tests directory without embedding it:
+You can also pass the tests directory without embedding it:
 ```
 func TestEspressoShot_Filesystem(t *testing.T) {
 	fileSystem := os.DirFS(".")
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), fileSystem).RunTest("queries", "report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), fileSystem).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t, queryValues, resultValues)
 }
