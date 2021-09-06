@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"io"
 	"io/fs"
-	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -28,12 +27,10 @@ type Argument struct {
 	Args   []Argument `yaml:"Args"`
 }
 
-func GetMetadata(fs fs.FS, path string, templateName string) (Metadata, error) {
+func GetMetadata(fs fs.FS, path string) (Metadata, error) {
 	var metadata Metadata
 
-	name := filepath.Join(path, templateName+".yaml")
-
-	file, err := fs.Open(name)
+	file, err := fs.Open(path)
 	if err != nil {
 		log.Error(err)
 		return metadata, err

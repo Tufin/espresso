@@ -3,15 +3,14 @@ package internal
 import (
 	"bytes"
 	"io/fs"
-	"path/filepath"
 	"text/template"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func GetQuery(fs fs.FS, path string, queryName string, args []Argument) (string, error) {
+func GetQuery(fs fs.FS, templateName string, args []Argument) (string, error) {
 
-	query, err := loadQueryRecursive(fs, path, queryName, args)
+	query, err := loadQueryRecursive(fs, templateName, args)
 	if err != nil {
 		log.Errorf("failed to load query with '%v'", err)
 		return "", err
@@ -20,28 +19,30 @@ func GetQuery(fs fs.FS, path string, queryName string, args []Argument) (string,
 	return query, nil
 }
 
-func loadQueryRecursive(fs fs.FS, path string, source string, args []Argument) (string, error) {
+func loadQueryRecursive(fs fs.FS, templateName string, args []Argument) (string, error) {
 
 	params := map[string]string{}
 
 	for _, arg := range args {
-		query, err := loadQueryRecursive(fs, path, arg.Source, arg.Args)
+		query, err := loadQueryRecursive(fs, arg.Source, arg.Args)
 		if err != nil {
 			return "", err
 		}
 		params[arg.Name] = query
 	}
 
-	return generateSQL(fs, path, source, params)
+	return generateSQL(fs, templateName, params)
 }
 
-func generateSQL(fs fs.FS, path string, templateName string, params map[string]string) (string, error) {
+func generateSQL(fs fs.FS, templateName string, params map[string]string) (string, error) {
 
-	name := filepath.Join(path, templateName+".sql")
-	t, err := template.New("").ParseFS(fs, name)
+	t, err := template.New("").ParseFS(fs, "**.sql")
 	if err != nil {
-		log.Error(err)
-		return "", err
+		t, err = template.New("").ParseFS(fs, "**/*.sql")
+		if err != nil {
+			log.Error(err)
+			return "", err
+		}
 	}
 
 	buf := bytes.Buffer{}

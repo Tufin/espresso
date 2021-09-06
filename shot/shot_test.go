@@ -15,14 +15,14 @@ import (
 var sqlTemplates embed.FS
 
 func TestEspressoShot_Embed(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), sqlTemplates).RunTest("queries", "report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), sqlTemplates).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_Filesystem(t *testing.T) {
 	fileSystem := os.DirFS(".")
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), fileSystem).RunTest("queries", "report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), fileSystem).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t, queryValues, resultValues)
 }
