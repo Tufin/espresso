@@ -74,7 +74,7 @@
 ## Running Tests From The Command-line
 ```
 go build
-./espresso -dir="shot/queries" -def="report_summary.yaml" -query="report_summary" -test="Test1"
+./espresso -dir="./" -def="shot/queries/report_summary.yaml" -query="report_summary" -test="Test1"
 ````
 
 ## Running Tests From Golang
@@ -95,8 +95,7 @@ func TestEspressoShot_Embed(t *testing.T) {
 You can also pass the tests directory without embedding it:
 ```
 func TestEspressoShot_Filesystem(t *testing.T) {
-	fileSystem := os.DirFS(".")
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), fileSystem).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), os.DirFS("./")).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t, queryValues, resultValues)
 }
