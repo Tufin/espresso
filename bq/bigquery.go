@@ -27,13 +27,13 @@ func NewClient(gcpProjectID string) Client {
 	if key := env.GetSensitive(EnvKeyBQToken); key != "" {
 		conf, err := google.JWTConfigFromJSON([]byte(key), bigquery.Scope)
 		if err != nil {
-			log.Fatalf("failed to config big-query JWT with '%v'", err)
+			log.Fatalf("failed to config big-query JWT with %v", err)
 		}
 
 		ctx := context.Background()
 		client, err := bigquery.NewClient(ctx, gcpProjectID, option.WithTokenSource(conf.TokenSource(ctx)))
 		if err != nil {
-			log.Fatalf("failed to create bigquery client with '%v'", err)
+			log.Fatalf("failed to create bigquery client with %v", err)
 		}
 
 		return &ClientImpl{bqClient: client}
@@ -41,7 +41,7 @@ func NewClient(gcpProjectID string) Client {
 
 	client, err := bigquery.NewClient(context.Background(), gcpProjectID)
 	if err != nil {
-		log.Fatalf("failed to create bigquery client without token with '%v'", err)
+		log.Fatalf("failed to create bigquery client without token with %v", err)
 	}
 
 	return &ClientImpl{bqClient: client}
@@ -74,7 +74,7 @@ func (client *ClientImpl) GetQueryStats(q string, params []bigquery.QueryParamet
 
 	job, err := query.Run(context.Background())
 	if err != nil {
-		log.Errorf("get query stats failed with '%v'", err)
+		log.Errorf("get query stats failed with %v", err)
 		return nil, err
 	}
 

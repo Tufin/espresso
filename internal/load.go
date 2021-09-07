@@ -13,7 +13,7 @@ func GetQuery(fs fs.FS, templateName string, args []Argument) (string, error) {
 
 	query, err := loadQueryRecursive(fs, templateName, args)
 	if err != nil {
-		log.Errorf("failed to load query with '%v'", err)
+		log.Errorf("failed to load query with %v", err)
 		return "", err
 	}
 
@@ -45,7 +45,7 @@ func loadQueryRecursive(fs fs.FS, templateName string, args []Argument) (string,
 		pattern = "*/" + pattern
 	}
 
-	return "", fmt.Errorf("couldn't find template file '%s'", fileName)
+	return "", fmt.Errorf("couldn't find template file %q", fileName)
 }
 
 func generateSQL(fs fs.FS, glob string, templateName string, params map[string]string) (string, error) {

@@ -13,7 +13,7 @@ func RunQuery(bqClient bq.Client, query string) (bq.Iterator, error) {
 
 	queryIterator, err := bqClient.QueryIterator(query, []bigquery.QueryParameter{})
 	if err != nil {
-		log.Errorf("failed to run query with '%v'", err)
+		log.Errorf("failed to run query with %v", err)
 		return nil, err
 	}
 
@@ -30,7 +30,7 @@ func ReadResult(queryIterator bq.Iterator) ([]map[string]bigquery.Value, error) 
 			if err == iterator.Done {
 				break
 			}
-			err = fmt.Errorf("failed to iterate with '%v'", err)
+			err = fmt.Errorf("failed to iterate with %v", err)
 			return nil, err
 		}
 		result = append(result, row)

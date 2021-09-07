@@ -28,20 +28,20 @@ func (shot Shot) RunTest(testDefinitionPath string, templateName string, testNam
 
 	metadata, err := internal.GetMetadata(shot.sqlTemplates, testDefinitionPath)
 	if err != nil {
-		log.Errorf("failed to get metadata with '%v'", err)
+		log.Errorf("failed to get metadata with %v", err)
 		return nil, nil, err
 	}
 
 	test, ok := metadata.Tests[testName]
 	if !ok {
-		err := fmt.Errorf("test '%s' undefined", testName)
+		err := fmt.Errorf("test %q undefined", testName)
 		log.Error(err)
 		return nil, nil, err
 	}
 
 	client := bq.NewClient(shot.projectID)
 	if err != nil {
-		log.Errorf("failed to create client with '%v'", err)
+		log.Errorf("failed to create client with %v", err)
 		return nil, nil, err
 	}
 

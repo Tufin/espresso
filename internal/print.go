@@ -19,7 +19,7 @@ func printResult(queryIterator bq.Iterator) {
 			if err == iterator.Done {
 				return
 			}
-			err = fmt.Errorf("failed to iterate on with '%v'", err)
+			err = fmt.Errorf("failed to iterate on with %v", err)
 			log.Error(err)
 			continue
 		}
