@@ -5,7 +5,7 @@
 - Test driven development: write tests for each query and run them like unit tests (except for the fact that they make calls to BigQuery)
 - Data as code: input and required output for tests can be defined as part of the code (as well as in real database tables)
 - No new languages to learn
-- Allow the user to run tests in their own development stack incl. programming language, IDE and CI/CD pipeline
+- Run tests in your own development stack: programming language, IDE and CI/CD pipeline
 
 ## Writing Your Own SQL Tests
 1. Write an SQL query using Go Text Template notation, for example [report_summary.sql](shot/queries/report_summary.sql):
