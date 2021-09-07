@@ -71,6 +71,12 @@
    ```
 5. Put all files together in a directory
 
+## Access To BigQuery
+The tests require access to BigQuery API. 
+Please set the following environment variables to grant espresso access to BigQuery:
+- `export GCLOUD_PROJECT_ID=<your GCP project ID>`
+- `export BIGQUERY_KEY=<a service account with permissions to use BigQuery>`
+
 ## Running Tests From The Command-line
 ```
 go build
@@ -105,11 +111,6 @@ func TestEspressoShot_Filesystem(t *testing.T) {
 	require.Equal(t, queryValues, resultValues)
 }
 ```
-
-## Access To BigQuery
-Please set the following environment variables to grant espresso access to BigQuery:
-- `export GCLOUD_PROJECT_ID=<your GCP project ID>`
-- `export BIGQUERY_KEY=<a service account with permissions to use BigQuery>`
 
 ## Current Status
 - This is an initial proof-of-concept and request-for-comments
