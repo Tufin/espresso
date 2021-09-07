@@ -3,7 +3,7 @@ package bq
 import (
 	"context"
 
-	"cloud.google.com/go/bigquery"	
+	"cloud.google.com/go/bigquery"
 	log "github.com/sirupsen/logrus"
 	"github.com/tufin/espresso/env"
 	"golang.org/x/oauth2/google"
