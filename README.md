@@ -77,6 +77,11 @@ go build
 ./espresso -dir="./" -def="shot/queries/report_summary.yaml" -query="report_summary" -test="Test1"
 ````
 
+## Running Tests From Docker
+```
+docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQUERY_KEY -v $(pwd)/shot:/shot:ro tufin/espresso -dir="/shot" -def="queries/report_summary.yaml" -query="report_summary" -test="Test1"
+```
+
 ## Running Tests From Golang
 1. Embed your tests directory
 2. Create an "Espresso Shot" and run it
