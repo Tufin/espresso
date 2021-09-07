@@ -10,7 +10,7 @@ jobs:
       GO111MODULE: 'on'
       CGO_ENABLED: '0'
       GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
-      BIGQUERY_KEY: ${{ secrets.BIGQUERY_KEY }}
+      BIGQUERY_KEY: echo ${{ secrets.BIGQUERY_KEY }} | base64 -d
     strategy:
       fail-fast: true
       matrix:
