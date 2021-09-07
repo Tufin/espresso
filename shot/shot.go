@@ -47,13 +47,11 @@ func (shot Shot) RunTest(testDefinitionPath string, templateName string, testNam
 
 	queryValues, err := loadAndRun(client, shot.sqlTemplates, templateName, test.Args)
 	if err != nil {
-		log.Errorf("failed to run query with '%v'", err)
 		return nil, nil, err
 	}
 
 	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result, []internal.Argument{})
 	if err != nil {
-		log.Errorf("failed to run result query with '%v'", err)
 		return nil, nil, err
 	}
 
@@ -71,5 +69,10 @@ func loadAndRun(client bq.Client, fs fs.FS, templateName string, args []internal
 		return nil, err
 	}
 
-	return internal.ReadResult(queryIterator)
+	result, err := internal.ReadResult(queryIterator)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
