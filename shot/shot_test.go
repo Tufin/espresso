@@ -21,14 +21,12 @@ func TestEspressoShot_Embed(t *testing.T) {
 }
 
 func TestEspressoShot_Filesystem(t *testing.T) {
-	env.Ophiuchus()
 	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), os.DirFS("./")).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_FilesystemWithDepth(t *testing.T) {
-	env.Ophiuchus()
 	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), os.DirFS("../")).RunTest("shot/queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t, queryValues, resultValues)
