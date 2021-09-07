@@ -1,3 +1,9 @@
+[![CI](https://github.com/Tufin/espresso/workflows/go/badge.svg)](https://github.com/Tufin/espresso/actions)
+[![codecov](https://codecov.io/gh/tufin/espresso/branch/main/graph/badge.svg?token=Y8BM6X77JY)](https://codecov.io/gh/tufin/espresso)
+[![Go Report Card](https://goreportcard.com/badge/github.com/tufin/espresso)](https://goreportcard.com/report/github.com/tufin/espresso)
+[![GoDoc](https://godoc.org/github.com/tufin/espresso?status.svg)](https://godoc.org/github.com/tufin/espresso)
+[![Docker Image Version](https://img.shields.io/docker/v/tufin/espresso?sort=semver)](https://hub.docker.com/r/tufin/espresso/tags)
+
 # espresso - a framework for testing BigQuery queries
 
 ## Goals
