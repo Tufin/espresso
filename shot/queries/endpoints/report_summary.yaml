@@ -1,7 +1,6 @@
 Name: report_summary
 Requires:
 - Endpoints
-- Base
 Tests:
   Test1:
     Args:

@@ -57,17 +57,18 @@
 4. Create a test definition YAML file decribing your query and tests like [report_summary.yaml](shot/queries/report_summary.yaml):
    ```
    Name: report_summary
-    Requires:
-    - Endpoints
-    Tests:
-      Test1:
-        Args:
-        - Name: Endpoints
-          Source: get_new_endpoints
-          Args:
-          - Name: NewEndpoints
-            Source: new_endpoints_input
-        Result: report_summary_result
+   Requires:
+   - Endpoints
+   Tests:
+     Test1:
+       Args:
+       - Name: Endpoints
+         Source: get_new_endpoints
+         Args:
+         - Name: NewEndpoints
+           Source: new_endpoints_input
+       Result: 
+         Source: report_summary_result
    ```
 5. Put all files together in a directory
 
