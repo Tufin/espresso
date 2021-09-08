@@ -1,6 +1,8 @@
 package bq
 
-import "cloud.google.com/go/bigquery"
+import (
+	"cloud.google.com/go/bigquery"
+)
 
 type Iterator interface {
 	TotalRows() uint64
