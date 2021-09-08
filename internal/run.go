@@ -14,6 +14,7 @@ func RunQuery(bqClient bq.Client, query string) (bq.Iterator, error) {
 	queryIterator, err := bqClient.QueryIterator(query, []bigquery.QueryParameter{})
 	if err != nil {
 		log.Errorf("failed to run query with %v", err)
+		fmt.Println("Query:", query)
 		return nil, err
 	}
 

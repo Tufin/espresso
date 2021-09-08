@@ -10,6 +10,7 @@ import (
 	"github.com/tufin/espresso/internal"
 )
 
+// Shot is used to load queries and run tests for them
 type Shot struct {
 	bqClient     bq.Client
 	sqlTemplates fs.FS
@@ -50,7 +51,7 @@ func (shot Shot) RunTest(testDefinitionPath string, templateName string, testNam
 		return nil, nil, err
 	}
 
-	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result, []internal.Argument{})
+	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result.Source, test.Result.Args)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -1,0 +1,14 @@
+Name: fruit
+Requires:
+- Base
+Tests:
+  Test1:
+    Args:
+    - Name: Base
+      Const: base
+    Result:
+      Source: fruit
+      Args:
+        - Name: Base
+          Const: base
+    

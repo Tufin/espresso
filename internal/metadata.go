@@ -18,12 +18,18 @@ type Metadata struct {
 
 type Test struct {
 	Args   []Argument `yaml:"Args"`
-	Result string     `yaml:"Result"`
+	Result Result     `yaml:"Result"`
+}
+
+type Result struct {
+	Source string     `yaml:"Source"`
+	Args   []Argument `yaml:"Args"`
 }
 
 type Argument struct {
 	Name   string     `yaml:"Name"`
 	Source string     `yaml:"Source"`
+	Const  string     `yaml:"Const"`
 	Args   []Argument `yaml:"Args"`
 }
 

@@ -1,6 +1,7 @@
 Name: report_summary
 Requires:
 - Endpoints
+- Base
 Tests:
   Test1:
     Args:
@@ -9,4 +10,5 @@ Tests:
       Args:
       - Name: NewEndpoints
         Source: new_endpoints_input
-    Result: report_summary_result
+    Result: 
+      Source: report_summary_result
