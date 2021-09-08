@@ -46,12 +46,12 @@ func (shot Shot) RunTest(testDefinitionPath string, templateName string, testNam
 		return nil, nil, err
 	}
 
-	queryValues, err := loadAndRun(client, shot.sqlTemplates, templateName, test.Args)
+	queryValues, err := loadAndRun(client, shot.sqlTemplates, templateName, test.Args, params)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result.Source, test.Result.Args)
+	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result.Source, test.Result.Args, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -59,13 +59,13 @@ func (shot Shot) RunTest(testDefinitionPath string, templateName string, testNam
 	return queryValues, resultValues, nil
 }
 
-func loadAndRun(client bq.Client, fs fs.FS, templateName string, args []internal.Argument) ([]map[string]bigquery.Value, error) {
+func loadAndRun(client bq.Client, fs fs.FS, templateName string, args []internal.Argument, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, error) {
 	query, err := internal.GetQuery(fs, templateName, args)
 	if err != nil {
 		return nil, err
 	}
 
-	queryIterator, err := internal.RunQuery(client, query)
+	queryIterator, err := internal.RunQuery(client, query, params)
 	if err != nil {
 		return nil, err
 	}

@@ -9,9 +9,9 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func RunQuery(bqClient bq.Client, query string) (bq.Iterator, error) {
+func RunQuery(bqClient bq.Client, query string, params []bigquery.QueryParameter) (bq.Iterator, error) {
 
-	queryIterator, err := bqClient.QueryIterator(query, []bigquery.QueryParameter{})
+	queryIterator, err := bqClient.QueryIterator(query, params)
 	if err != nil {
 		log.Errorf("failed to run query with %v", err)
 		fmt.Println("query:", query)
