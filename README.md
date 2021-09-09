@@ -81,12 +81,12 @@ Please set the following environment variables to grant espresso access to BigQu
 ## Running Tests From The Command-line
 ```
 go build
-./espresso -dir="./" -def="shot/queries/report_summary.yaml" -query="report_summary" -test="Test1"
+./espresso -dir="./shot/queries/endpoints/" -def="report_summary.yaml" -query="report_summary" -test="Test1"
 ````
 
 ## Running Tests From Docker
 ```
-docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQUERY_KEY -v $(pwd)/shot:/shot:ro tufin/espresso -dir="/shot" -def="queries/report_summary.yaml" -query="report_summary" -test="Test1"
+docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQUERY_KEY -v $(pwd)/shot:/shot:ro tufin/espresso -dir="/shot" -def="queries/endpoints/report_summary.yaml" -query="report_summary" -test="Test1"
 ```
 
 ## Running Tests From Golang
@@ -94,22 +94,22 @@ docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQ
 2. Create an "Espresso Shot" and run it
 3. Use standard Go assertions to check the expected result against the actual output
 ```
-//go:embed queries
-var sqlTemplates embed.FS
+//go:embed queries/endpoints
+var endpointTemplates embed.FS
 
 func TestEspressoShot_Embed(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), sqlTemplates).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), endpointTemplates).RunTest("queries/endpoints/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
-	require.Equal(t, queryValues, resultValues)
+	require.ElementsMatch(t, queryValues, resultValues)
 }
 ```
 
 You can also pass the tests directory without embedding it:
 ```
 func TestEspressoShot_Filesystem(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), os.DirFS("./")).RunTest("queries/report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), os.DirFS("./queries/endpoints")).RunTest("report_summary.yaml", "report_summary", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
-	require.Equal(t, queryValues, resultValues)
+	require.ElementsMatch(t, queryValues, resultValues)
 }
 ```
 
