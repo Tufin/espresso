@@ -77,6 +77,3 @@ func loadAndRun(client bq.Client, fs fs.FS, templateName string, args []internal
 
 	return result, nil
 }
-
-// func (shot Shot) TestAll(testDefinitionPath string, templateName string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
-// }
