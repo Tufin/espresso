@@ -25,7 +25,7 @@ func NewShot(project string, fs fs.FS) Shot {
 	}
 }
 
-func (shot Shot) RunTest(testDefinitionPath string, templateName string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
+func (shot Shot) RunTest(testDefinitionPath string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
 
 	metadata, err := internal.GetMetadata(shot.sqlTemplates, testDefinitionPath)
 	if err != nil {
@@ -46,7 +46,7 @@ func (shot Shot) RunTest(testDefinitionPath string, templateName string, testNam
 		return nil, nil, err
 	}
 
-	queryValues, err := loadAndRun(client, shot.sqlTemplates, templateName, test.Args, params)
+	queryValues, err := loadAndRun(client, shot.sqlTemplates, metadata.Name, test.Args, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -77,3 +77,6 @@ func loadAndRun(client bq.Client, fs fs.FS, templateName string, args []internal
 
 	return result, nil
 }
+
+// func (shot Shot) TestAll(testDefinitionPath string, templateName string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
+// }

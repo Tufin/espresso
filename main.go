@@ -11,12 +11,11 @@ import (
 	"github.com/tufin/espresso/shot"
 )
 
-var dir, def, query, test string
+var dir, def, test string
 
 func init() {
 	flag.StringVar(&dir, "dir", "", "base dir containing SQL files and definition file")
 	flag.StringVar(&def, "def", "", "relative path of test definition file")
-	flag.StringVar(&query, "query", "", "query name")
 	flag.StringVar(&test, "test", "", "test name")
 }
 
@@ -24,7 +23,7 @@ func main() {
 	flag.Parse()
 
 	fileSystem := os.DirFS(dir)
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), fileSystem).RunTest(def, query, test, []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), fileSystem).RunTest(def, test, []bigquery.QueryParameter{})
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
