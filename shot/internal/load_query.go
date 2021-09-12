@@ -10,7 +10,7 @@ func GetQuery(fs fs.FS, templateName string, args []Argument) (string, error) {
 
 	query, err := loadQueryRecursive(fs, templateName, args)
 	if err != nil {
-		log.Errorf("failed to load query with %v", err)
+		log.Errorf("failed to load query for %q with %v", templateName, err)
 		return "", err
 	}
 
