@@ -6,7 +6,7 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	log "github.com/sirupsen/logrus"
-	"github.com/tufin/espresso/bq"
+	"github.com/tufin/espresso/shot/bq"
 	"github.com/tufin/espresso/shot/internal"
 )
 
