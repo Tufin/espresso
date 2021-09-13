@@ -1,4 +1,4 @@
-package internal
+package shot
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func RunQuery(bqClient bq.Client, query string, params []bigquery.QueryParameter) (bq.Iterator, error) {
+func runQuery(bqClient bq.Client, query string, params []bigquery.QueryParameter) (bq.Iterator, error) {
 
 	queryIterator, err := bqClient.QueryIterator(query, params)
 	if err != nil {
@@ -21,7 +21,7 @@ func RunQuery(bqClient bq.Client, query string, params []bigquery.QueryParameter
 	return queryIterator, nil
 }
 
-func ReadResult(queryIterator bq.Iterator) ([]map[string]bigquery.Value, error) {
+func readResult(queryIterator bq.Iterator) ([]map[string]bigquery.Value, error) {
 
 	result := []map[string]bigquery.Value{}
 	for {

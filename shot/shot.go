@@ -7,7 +7,6 @@ import (
 	"cloud.google.com/go/bigquery"
 	log "github.com/sirupsen/logrus"
 	"github.com/tufin/espresso/shot/bq"
-	"github.com/tufin/espresso/shot/internal"
 )
 
 // Shot is used to load queries and run tests for them
@@ -15,19 +14,22 @@ type Shot struct {
 	bqClient     bq.Client
 	sqlTemplates fs.FS
 	projectID    string
+	dataset      string
 }
 
-func NewShot(project string, fs fs.FS) Shot {
+func NewShot(project string, dataset string, fs fs.FS) Shot {
+
 	return Shot{
 		bqClient:     bq.NewClient(project),
 		sqlTemplates: fs,
 		projectID:    project,
+		dataset:      dataset,
 	}
 }
 
 func (shot Shot) RunTest(testDefinitionPath string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
 
-	metadata, err := internal.GetMetadata(shot.sqlTemplates, testDefinitionPath)
+	metadata, err := getMetadata(shot.sqlTemplates, testDefinitionPath)
 	if err != nil {
 		log.Errorf("failed to get metadata with %v", err)
 		return nil, nil, err
@@ -40,18 +42,12 @@ func (shot Shot) RunTest(testDefinitionPath string, testName string, params []bi
 		return nil, nil, err
 	}
 
-	client := bq.NewClient(shot.projectID)
-	if err != nil {
-		log.Errorf("failed to create client with %v", err)
-		return nil, nil, err
-	}
-
-	queryValues, err := loadAndRun(client, shot.sqlTemplates, metadata.Name, test.Args, params)
+	queryValues, err := shot.loadAndRun(metadata.Name, test.Args, params)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resultValues, err := loadAndRun(client, shot.sqlTemplates, test.Result.Source, test.Result.Args, params)
+	resultValues, err := shot.loadAndRun(test.Result.Source, test.Result.Args, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -59,18 +55,18 @@ func (shot Shot) RunTest(testDefinitionPath string, testName string, params []bi
 	return queryValues, resultValues, nil
 }
 
-func loadAndRun(client bq.Client, fs fs.FS, templateName string, args []internal.Argument, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, error) {
-	query, err := internal.GetQuery(fs, templateName, args)
+func (shot Shot) loadAndRun(templateName string, args []argument, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, error) {
+	query, err := shot.getQuery(templateName, args)
 	if err != nil {
 		return nil, err
 	}
 
-	queryIterator, err := internal.RunQuery(client, query, params)
+	queryIterator, err := runQuery(shot.bqClient, query, params)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := internal.ReadResult(queryIterator)
+	result, err := readResult(queryIterator)
 	if err != nil {
 		return nil, err
 	}

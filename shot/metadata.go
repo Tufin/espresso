@@ -1,4 +1,4 @@
-package internal
+package shot
 
 import (
 	"bufio"
@@ -9,32 +9,33 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type Metadata struct {
+type metadata struct {
 	Name     string          `yaml:"Name"`
 	Requires []string        `yaml:"Requires"`
 	Params   []string        `yaml:"Params"`
-	Tests    map[string]Test `yaml:"Tests"`
+	Tests    map[string]test `yaml:"Tests"`
 }
 
-type Test struct {
-	Args   []Argument `yaml:"Args"`
-	Result Result     `yaml:"Result"`
+type test struct {
+	Args   []argument `yaml:"Args"`
+	Result result     `yaml:"Result"`
 }
 
-type Result struct {
+type result struct {
 	Source string     `yaml:"Source"`
-	Args   []Argument `yaml:"Args"`
+	Args   []argument `yaml:"Args"`
 }
 
-type Argument struct {
+type argument struct {
 	Name   string     `yaml:"Name"`
 	Source string     `yaml:"Source"`
 	Const  string     `yaml:"Const"`
-	Args   []Argument `yaml:"Args"`
+	Table  string     `yaml:"Table"`
+	Args   []argument `yaml:"Args"`
 }
 
-func GetMetadata(fs fs.FS, path string) (Metadata, error) {
-	var metadata Metadata
+func getMetadata(fs fs.FS, path string) (metadata, error) {
+	var metadata metadata
 
 	file, err := fs.Open(path)
 	if err != nil {
