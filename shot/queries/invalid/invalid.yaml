@@ -1,0 +1,7 @@
+Name: invalid
+Requires:
+- Base
+Tests:
+  Test1:
+    Args:
+    - Name: Base

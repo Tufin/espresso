@@ -37,3 +37,8 @@ func TestEspressoShot_Const(t *testing.T) {
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
+
+func TestEspressoShot_Invalid(t *testing.T) {
+	_, _, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/invalid")).RunTest("invalid.yaml", "Test1", []bigquery.QueryParameter{})
+	require.Error(t, err)
+}
