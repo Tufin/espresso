@@ -10,7 +10,6 @@ import (
 // how many directories to descend when looking for templates and definitions
 const depth = 5
 
-
 func generateSQL(fsys fs.FS, templateName string, params map[string]string) (string, error) {
 
 	fileName := templateName + ".sql"
