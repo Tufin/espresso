@@ -7,15 +7,16 @@ import (
 	"text/template"
 )
 
-func generateSQL(fs fs.FS, templateName string, params map[string]string) (string, error) {
+// how many directories to descend when looking for templates and definitions
+const depth = 5
 
-	// how many directories to enter until giving up
-	const depth = 5
+
+func generateSQL(fsys fs.FS, templateName string, params map[string]string) (string, error) {
 
 	fileName := templateName + ".sql"
 	pattern := fileName
 	for i := 0; i < depth; i++ {
-		result, err := generateSQLInternal(fs, pattern, templateName, params)
+		result, err := generateSQLInternal(fsys, pattern, templateName, params)
 		if err == nil {
 			return result, nil
 		}
@@ -25,9 +26,9 @@ func generateSQL(fs fs.FS, templateName string, params map[string]string) (strin
 	return "", fmt.Errorf("couldn't find template file %q", fileName)
 }
 
-func generateSQLInternal(fs fs.FS, glob string, templateName string, params map[string]string) (string, error) {
+func generateSQLInternal(fsys fs.FS, glob string, templateName string, params map[string]string) (string, error) {
 
-	t, err := template.ParseFS(fs, glob)
+	t, err := template.ParseFS(fsys, glob)
 	if err != nil {
 		return "", err
 	}

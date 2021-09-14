@@ -11,25 +11,25 @@ import (
 
 // Shot is used to load queries and run tests for them
 type Shot struct {
-	bqClient     bq.Client
-	sqlTemplates fs.FS
-	projectID    string
-	dataset      string
+	bqClient  bq.Client
+	fsys      fs.FS
+	projectID string
+	dataset   string
 }
 
 func NewShot(project string, dataset string, fs fs.FS) Shot {
 
 	return Shot{
-		bqClient:     bq.NewClient(project),
-		sqlTemplates: fs,
-		projectID:    project,
-		dataset:      dataset,
+		bqClient:  bq.NewClient(project),
+		fsys:      fs,
+		projectID: project,
+		dataset:   dataset,
 	}
 }
 
 func (shot Shot) RunTest(testDefinitionPath string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
 
-	metadata, err := getMetadata(shot.sqlTemplates, testDefinitionPath)
+	metadata, err := getMetadata(shot.fsys, testDefinitionPath)
 	if err != nil {
 		log.Errorf("failed to get metadata with %v", err)
 		return nil, nil, err

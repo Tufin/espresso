@@ -29,7 +29,7 @@ func (shot Shot) loadQueryRecursive(templateName string, args []argument) (strin
 		params[arg.Name] = param
 	}
 
-	return generateSQL(shot.sqlTemplates, templateName, params)
+	return generateSQL(shot.fsys, templateName, params)
 }
 
 func (shot Shot) processArg(arg argument) (string, error) {

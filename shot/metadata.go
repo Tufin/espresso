@@ -2,6 +2,7 @@ package shot
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"io/fs"
 
@@ -34,10 +35,30 @@ type argument struct {
 	Args   []argument `yaml:"Args"`
 }
 
-func getMetadata(fs fs.FS, path string) (metadata, error) {
+func getMetadata(fsys fs.FS, templateName string) (metadata, error) {
 	var metadata metadata
 
-	file, err := fs.Open(path)
+	fileName := templateName + ".yaml"
+	pattern := fileName
+	for i := 0; i < depth; i++ {
+		list, err := fs.Glob(fsys, pattern)
+		if err != nil {
+			return metadata, err
+		}
+		if len(list) > 0 {
+			return openMetadata(fsys, list[0])
+		}
+		pattern = "*/" + pattern
+	}
+
+	return metadata, fmt.Errorf("couldn't find definition file %q", fileName)
+}
+
+func openMetadata(fsys fs.FS, path string) (metadata, error) {
+
+	var metadata metadata
+
+	file, err := fsys.Open(path)
 	if err != nil {
 		log.Error(err)
 		return metadata, err
