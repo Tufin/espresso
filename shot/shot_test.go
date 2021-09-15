@@ -32,6 +32,12 @@ func TestEspressoShot_FilesystemWithDepth(t *testing.T) {
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
+func TestEspressoShot_HierarchicalTemplates(t *testing.T) {
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "TestHierarchical", []bigquery.QueryParameter{})
+	require.NoError(t, err)
+	require.ElementsMatch(t, queryValues, resultValues)
+}
+
 func TestEspressoShot_Const(t *testing.T) {
 	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
