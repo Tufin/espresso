@@ -6,8 +6,5 @@ Tests:
     Args:
     - Name: Endpoints
       Source: get_new_endpoints
-      Args:
-      - Name: NewEndpoints
-        Source: new_endpoints_input
     Result: 
       Source: report_summary_result

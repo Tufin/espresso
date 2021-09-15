@@ -6,9 +6,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (shot Shot) getQuery(templateName string, args []argument) (string, error) {
+func (shot Shot) getQuery(templateName string, testName string, args []argument) (string, error) {
 
-	query, err := shot.loadQueryRecursive(templateName, args)
+	query, err := shot.loadQueryRecursive(templateName, testName, args)
 	if err != nil {
 		log.Errorf("failed to load query for %q with %v", templateName, err)
 		return "", err
@@ -17,12 +17,16 @@ func (shot Shot) getQuery(templateName string, args []argument) (string, error) 
 	return query, nil
 }
 
-func (shot Shot) loadQueryRecursive(templateName string, args []argument) (string, error) {
+func (shot Shot) loadQueryRecursive(templateName string, testName string, args []argument) (string, error) {
 
 	params := map[string]string{}
 
+	if len(args) == 0 {
+		args = shot.getArgsFromTemplate(templateName, testName)
+	}
+
 	for _, arg := range args {
-		param, err := shot.processArg(arg)
+		param, err := shot.processArg(arg, testName)
 		if err != nil {
 			return "", fmt.Errorf("invalid template %q due to %w", templateName, err)
 		}
@@ -32,7 +36,16 @@ func (shot Shot) loadQueryRecursive(templateName string, args []argument) (strin
 	return generateSQL(shot.fsys, templateName, params)
 }
 
-func (shot Shot) processArg(arg argument) (string, error) {
+func (shot Shot) getArgsFromTemplate(templateName string, testName string) []argument {
+	if metadata, err := getMetadata(shot.fsys, templateName); err == nil {
+		if test, ok := metadata.Tests[testName]; ok {
+			return test.Args
+		}
+	}
+	return []argument{}
+}
+
+func (shot Shot) processArg(arg argument, testName string) (string, error) {
 	if arg.Const != "" {
 		return arg.Const, nil
 	}
@@ -42,7 +55,7 @@ func (shot Shot) processArg(arg argument) (string, error) {
 	}
 
 	if arg.Source != "" {
-		query, err := shot.loadQueryRecursive(arg.Source, arg.Args)
+		query, err := shot.loadQueryRecursive(arg.Source, testName, arg.Args)
 		if err != nil {
 			return "", err
 		}

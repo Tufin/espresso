@@ -1,0 +1,8 @@
+Name: get_new_endpoints
+Requires:
+- NewEndpoints
+Tests:
+  Test1:
+    Args:
+    - Name: NewEndpoints
+      Source: new_endpoints_input

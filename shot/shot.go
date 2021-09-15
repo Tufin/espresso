@@ -27,9 +27,9 @@ func NewShot(project string, dataset string, fs fs.FS) Shot {
 	}
 }
 
-func (shot Shot) RunTest(testDefinitionPath string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
+func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
 
-	metadata, err := getMetadata(shot.fsys, testDefinitionPath)
+	metadata, err := getMetadata(shot.fsys, query)
 	if err != nil {
 		log.Errorf("failed to get metadata with %v", err)
 		return nil, nil, err
@@ -42,12 +42,12 @@ func (shot Shot) RunTest(testDefinitionPath string, testName string, params []bi
 		return nil, nil, err
 	}
 
-	queryValues, err := shot.loadAndRun(metadata.Name, test.Args, params)
+	queryValues, err := shot.loadAndRun(metadata.Name, testName, test.Args, params)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resultValues, err := shot.loadAndRun(test.Result.Source, test.Result.Args, params)
+	resultValues, err := shot.loadAndRun(test.Result.Source, testName, test.Result.Args, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -55,8 +55,8 @@ func (shot Shot) RunTest(testDefinitionPath string, testName string, params []bi
 	return queryValues, resultValues, nil
 }
 
-func (shot Shot) loadAndRun(templateName string, args []argument, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, error) {
-	query, err := shot.getQuery(templateName, args)
+func (shot Shot) loadAndRun(templateName string, testName string, args []argument, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, error) {
+	query, err := shot.getQuery(templateName, testName, args)
 	if err != nil {
 		return nil, err
 	}
