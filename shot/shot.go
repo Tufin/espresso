@@ -27,6 +27,14 @@ func NewShot(project string, dataset string, fs fs.FS) Shot {
 	}
 }
 
+/*
+RunTest runs a single SQL query against BigQuery
+query is the name of the query. There must be a correponding yaml definition file and a template in the filesystem.
+testName is the name of the test to run, it must appear in the yaml definition file
+params are BigQuery paramaters
+row is the argument that will be passed to bigquery.RowIterator.Next
+The result will be a slice of the same type of 'row' with the return values of the query
+*/
 func (shot Shot) RunQuery(query string, testName string, params []bigquery.QueryParameter, row interface{}) (interface{}, error) {
 	metadata, err := getMetadata(shot.fsys, query)
 	if err != nil {
@@ -49,6 +57,14 @@ func (shot Shot) RunQuery(query string, testName string, params []bigquery.Query
 	return queryValues, nil
 }
 
+/*
+RunTest performs a BigQuery test by running two SQL queries: one for the test and another for the exptected result
+query is the name of the query. There must be a correponding yaml definition file and a template in the filesystem.
+testName is the name of the test to run, it must appear in the yaml definition file
+params are BigQuery paramaters
+row is the argument that will be passed to bigquery.RowIterator.Next
+The results will be slices of the same type of 'row' with the return values of the query and corresponding result
+*/
 func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryParameter, row interface{}) (interface{}, interface{}, error) {
 
 	metadata, err := getMetadata(shot.fsys, query)
