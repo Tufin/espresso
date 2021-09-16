@@ -28,7 +28,7 @@ func NewShot(project string, dataset string, fs fs.FS) Shot {
 }
 
 /*
-RunTest runs a single SQL query against BigQuery
+RunQuery runs a single SQL query against BigQuery
 query is the name of the query. There must be a correponding yaml definition file and a template in the filesystem.
 testName is the name of the test to run, it must appear in the yaml definition file
 params are BigQuery paramaters
