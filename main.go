@@ -23,7 +23,7 @@ func main() {
 	flag.Parse()
 
 	fileSystem := os.DirFS(dir)
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", fileSystem).RunTest(query, test, []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", fileSystem).RunTest(query, test, []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)

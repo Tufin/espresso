@@ -21,12 +21,12 @@ func runQuery(bqClient bq.Client, query string, params []bigquery.QueryParameter
 	return queryIterator, nil
 }
 
-func readResult(queryIterator bq.Iterator) ([]map[string]bigquery.Value, error) {
+func readResult(queryIterator bq.Iterator, row interface{}) (interface{}, error) {
 
-	result := []map[string]bigquery.Value{}
+	result := []interface{}{}
+
 	for {
-		row := map[string]bigquery.Value{}
-		err := queryIterator.Next(&row)
+		err := queryIterator.Next(row)
 		if err != nil {
 			if err == iterator.Done {
 				break

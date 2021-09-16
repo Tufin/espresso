@@ -15,41 +15,51 @@ import (
 var endpointTemplates embed.FS
 
 func TestEspressoShot_Embed(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_Filesystem(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/endpoints")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/endpoints")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_FilesystemWithDepth(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_HierarchicalTemplates(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "TestHierarchical", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "TestHierarchical", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_Const(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{})
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	require.NoError(t, err)
+	require.ElementsMatch(t, queryValues, resultValues)
+}
+
+func TestEspressoShot_StructValue(t *testing.T) {
+	row := struct {
+		Fruit string
+	}{}
+
+	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &row)
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_Invalid(t *testing.T) {
-	_, _, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/invalid")).RunTest("invalid", "Test1", []bigquery.QueryParameter{})
+	_, _, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/invalid")).RunTest("invalid", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.EqualError(t, err, "invalid template \"invalid\" due to invalid arg \"Base\" lacks source, const and table definitions")
 }
 
 func TestEspressoShot_NoTemplate(t *testing.T) {
-	_, _, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./")).RunTest("reuven", "Test1", []bigquery.QueryParameter{})
+	_, _, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./")).RunTest("reuven", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.EqualError(t, err, "couldn't find definition file \"reuven.yaml\"")
 }

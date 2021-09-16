@@ -27,7 +27,29 @@ func NewShot(project string, dataset string, fs fs.FS) Shot {
 	}
 }
 
-func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, []map[string]bigquery.Value, error) {
+func (shot Shot) RunQuery(query string, testName string, params []bigquery.QueryParameter, row interface{}) (interface{}, error) {
+	metadata, err := getMetadata(shot.fsys, query)
+	if err != nil {
+		log.Errorf("failed to get metadata with %v", err)
+		return nil, err
+	}
+
+	test, ok := metadata.Tests[testName]
+	if !ok {
+		err := fmt.Errorf("test %q undefined", testName)
+		log.Error(err)
+		return nil, err
+	}
+
+	queryValues, err := shot.loadAndRun(metadata.Name, testName, test.Args, params, row)
+	if err != nil {
+		return nil, err
+	}
+
+	return queryValues, nil
+}
+
+func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryParameter, row interface{}) (interface{}, interface{}, error) {
 
 	metadata, err := getMetadata(shot.fsys, query)
 	if err != nil {
@@ -42,12 +64,12 @@ func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryP
 		return nil, nil, err
 	}
 
-	queryValues, err := shot.loadAndRun(metadata.Name, testName, test.Args, params)
+	queryValues, err := shot.loadAndRun(metadata.Name, testName, test.Args, params, row)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resultValues, err := shot.loadAndRun(test.Result.Source, testName, test.Result.Args, params)
+	resultValues, err := shot.loadAndRun(test.Result.Source, testName, test.Result.Args, params, row)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -55,7 +77,7 @@ func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryP
 	return queryValues, resultValues, nil
 }
 
-func (shot Shot) loadAndRun(templateName string, testName string, args []argument, params []bigquery.QueryParameter) ([]map[string]bigquery.Value, error) {
+func (shot Shot) loadAndRun(templateName string, testName string, args []argument, params []bigquery.QueryParameter, row interface{}) (interface{}, error) {
 	query, err := shot.getQuery(templateName, testName, args)
 	if err != nil {
 		return nil, err
@@ -66,7 +88,7 @@ func (shot Shot) loadAndRun(templateName string, testName string, args []argumen
 		return nil, err
 	}
 
-	result, err := readResult(queryIterator)
+	result, err := readResult(queryIterator, row)
 	if err != nil {
 		return nil, err
 	}
