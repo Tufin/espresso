@@ -21,7 +21,7 @@ func runQuery(bqClient bq.Client, query string, params []bigquery.QueryParameter
 	return queryIterator, nil
 }
 
-func readResult(queryIterator bq.Iterator, row interface{}) (interface{}, error) {
+func readResult(queryIterator bq.Iterator, row interface{}) ([]interface{}, error) {
 
 	result := []interface{}{}
 

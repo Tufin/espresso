@@ -35,7 +35,7 @@ params are BigQuery paramaters
 row is the argument that will be passed to bigquery.RowIterator.Next
 The result will be a slice of the same type of 'row' with the return values of the query
 */
-func (shot Shot) RunQuery(query string, testName string, params []bigquery.QueryParameter, row interface{}) (interface{}, error) {
+func (shot Shot) RunQuery(query string, testName string, params []bigquery.QueryParameter, row interface{}) ([]interface{}, error) {
 	metadata, err := getMetadata(shot.fsys, query)
 	if err != nil {
 		log.Errorf("failed to get metadata with %v", err)
@@ -93,7 +93,7 @@ func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryP
 	return queryValues, resultValues, nil
 }
 
-func (shot Shot) loadAndRun(templateName string, testName string, args []argument, params []bigquery.QueryParameter, row interface{}) (interface{}, error) {
+func (shot Shot) loadAndRun(templateName string, testName string, args []argument, params []bigquery.QueryParameter, row interface{}) ([]interface{}, error) {
 	query, err := shot.getQuery(templateName, testName, args)
 	if err != nil {
 		return nil, err
