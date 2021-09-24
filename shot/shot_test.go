@@ -3,6 +3,7 @@ package shot_test
 import (
 	"embed"
 	"os"
+	"strings"
 	"testing"
 
 	"cloud.google.com/go/bigquery"
@@ -74,9 +75,9 @@ func TestEspressoShot_NoTemplate(t *testing.T) {
 }
 
 func TestGetQuery(t *testing.T) {
-	query, err := shot.NewShot(nil, "", "", os.DirFS("./queries/endpoints")).GetQuery("report_summary", "Test1", []bigquery.QueryParameter{})
+	query, err := shot.NewShot(nil, "", "", os.DirFS("./queries/fruit")).GetQuery("fruit", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t,
-		"\n\nWITH base AS (\n    SELECT\n        request_method,\n        path,\n        SUM(hit_count_yesterday) AS hit_count_yesterday,\n    FROM \n\n(\n    SELECT * FROM \n\n(\n    SELECT\n        \"GET\" AS request_method,\n        \"/api/rome/conf/master/tenants\" AS path,\n        200 AS status_code,\n        2 AS hit_count_yesterday,\n    UNION ALL\n    SELECT\n        \"GET\" AS request_method,\n        \"/api/rome/conf/master/tenants\" AS path,\n        500 AS status_code,\n        1 AS hit_count_yesterday,\n)\n\n\n)\n\n\n    WHERE status_code<400\n    GROUP BY \n        request_method,\n        path\n)\nSELECT\n    COUNT(*) AS total_endpoints,\n    COUNTIF(hit_count_yesterday>0) AS total_endpoints_yesterday,\n    SUM(hit_count_yesterday) AS hit_count_yesterday,\nFROM base\n\n",
-		query)
+		"\n\nWITH base AS (\n    SELECT\n        \"orange\" AS fruit\n    UNION ALL\n    SELECT\n        \"apple\"\n)\nSELECT\n    fruit\nFROM base\n\n",
+		strings.ReplaceAll(query, "\r", ""))
 }
