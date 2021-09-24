@@ -17,10 +17,10 @@ type Shot struct {
 	dataset   string
 }
 
-func NewShot(project string, dataset string, fs fs.FS) Shot {
+func NewShot(client bq.Client, project string, dataset string, fs fs.FS) Shot {
 
 	return Shot{
-		bqClient:  bq.NewClient(project),
+		bqClient:  client,
 		fsys:      fs,
 		projectID: project,
 		dataset:   dataset,
@@ -91,6 +91,34 @@ func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryP
 	}
 
 	return queryValues, resultValues, nil
+}
+
+/*
+GetQuery returns the SQL query
+query is the name of the query. There must be a correponding yaml definition file and a template in the filesystem.
+testName is the name of the test to run, it must appear in the yaml definition file
+params are BigQuery paramaters
+*/
+func (shot Shot) GetQuery(query string, testName string, params []bigquery.QueryParameter) (string, error) {
+	metadata, err := getMetadata(shot.fsys, query)
+	if err != nil {
+		log.Errorf("failed to get metadata with %v", err)
+		return "", err
+	}
+
+	test, ok := metadata.Tests[testName]
+	if !ok {
+		err := fmt.Errorf("test %q undefined", testName)
+		log.Error(err)
+		return "", err
+	}
+
+	result, err := shot.getQuery(metadata.Name, testName, test.Args)
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
 }
 
 func (shot Shot) loadAndRun(templateName string, testName string, args []argument, params []bigquery.QueryParameter, row interface{}) ([]interface{}, error) {

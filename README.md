@@ -98,8 +98,9 @@ docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQ
 var endpointTemplates embed.FS
 
 func TestEspressoShot_Embed(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
-	require.NoError(t, err) 
+	project := env.GetGCPProjectID()
+	queryValues, resultValues, err := shot.NewShot(bq.NewClient(project), project, "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 ```
@@ -107,7 +108,8 @@ func TestEspressoShot_Embed(t *testing.T) {
 You can also pass the tests directory without embedding it:
 ```
 func TestEspressoShot_Filesystem(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShot(env.GetGCPProjectID(), "", os.DirFS("./queries/endpoints")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	project := env.GetGCPProjectID()
+	queryValues, resultValues, err := shot.NewShot(bq.NewClient(project), project, "", os.DirFS("./queries/endpoints")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
