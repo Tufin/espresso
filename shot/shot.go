@@ -27,6 +27,15 @@ func NewShot(client bq.Client, project string, dataset string, fs fs.FS) Shot {
 	}
 }
 
+func NewShotWithClient(project string, dataset string, fs fs.FS) Shot {
+	return Shot{
+		bqClient:  bq.NewClient(project),
+		fsys:      fs,
+		projectID: project,
+		dataset:   dataset,
+	}
+}
+
 /*
 RunQuery runs a single SQL query against BigQuery
 query is the name of the query. There must be a correponding yaml definition file and a template in the filesystem.
