@@ -5,7 +5,6 @@ import (
 )
 
 type Iterator interface {
-	TotalRows() uint64
 	Next(dst interface{}) error
 }
 
@@ -16,11 +15,6 @@ type IteratorWrapper struct {
 func newRawIterator(iterator *bigquery.RowIterator) Iterator {
 
 	return &IteratorWrapper{iterator: iterator}
-}
-
-func (i *IteratorWrapper) TotalRows() uint64 {
-
-	return i.iterator.TotalRows
 }
 
 func (i *IteratorWrapper) Next(dst interface{}) error {
