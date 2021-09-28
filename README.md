@@ -69,8 +69,27 @@
            Source: new_endpoints_input
        Result: 
          Source: report_summary_result
+     TestHierarchical:
+       Args:
+       - Name: Endpoints
+         Source: get_new_endpoints
+       Result: 
+         Source: report_summary_result
    ```
-5. Put all files together in a directory
+1. Put all files together in a directory
+
+## Query Definitions
+Query definition file specifies one or more ways to construct an SQL query from a corresponding SQL template.  
+A definition file contains Tests, each specifying how to construct an SQL query and an optional expected result.  
+To create a query from its components, espresso looks for an SQL template with the same name as the definition file itself, and then interprets the Args.  
+Each Arg must have a name field that corresponds to an argument in the corresponding SQL template and one of the following fields:
+1. Source - Another SQL template which will be parsed and injected into the containing query.
+2. Table - a table name which will be combined with the Google project and BigQuery dataset (defined in Shot) and injected into the containing query.
+3. Const - a string that will be injected into the containing query.
+
+Source may contain its own args, or, if it doesn't, espresso will look for a corresponding template file with a test of the same name and parse the args from there.
+
+Result has the same semantics as an Arg, except it has no Name field.
 
 ## Access To BigQuery
 The tests require access to BigQuery API. 
@@ -82,7 +101,7 @@ Please set the following environment variables to grant espresso access to BigQu
 ```
 go build
 ./espresso -dir="./shot/queries/endpoints/" -query="report_summary" -test="Test1"
-````
+```
 
 ## Running Tests From Docker
 ```
@@ -113,6 +132,10 @@ func TestEspressoShot_Filesystem(t *testing.T) {
 }
 ```
 
+## Running Tests In Other Languages
+Currently only Go is supported.
+If you'd like to contribute additional language support, please start a dicssussion.
+
 ## Current Status
 - This is an initial proof-of-concept and request-for-comments
-- Please submit your feedback as pull requests
+- Please submit your feedback as pull requests, issues or discussions.
