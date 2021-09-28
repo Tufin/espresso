@@ -11,70 +11,61 @@
 - Test driven development: write tests for each query and run them like unit tests (except for the fact that they make calls to BigQuery)
 - Data as code: input and required output for tests can be defined as part of the code (as well as in real database tables)
 - No new languages to learn
-- Run tests in your own development stack: programming language, IDE and CI/CD pipeline
+- Write tests in your own development stack: programming language, IDE and CI/CD pipeline
 
 ## Writing Your Own SQL Tests
-1. Write an SQL query using Go Text Template notation, for example [report_summary.sql](shot/queries/endpoints/report_summary.sql):
+1. Write an SQL query using Go Text Template notation, for example:
    ```
-    {{ define "report_summary" }}
+   {{ define "fruit" }}
+ 
+   WITH base AS (
+       {{ .Base }}
+   )
+   SELECT
+       fruit
+   FROM base
 
-    WITH base AS (
-        SELECT
-            request_method,
-            path,
-            SUM(hit_count_yesterday) AS hit_count_yesterday,
-        FROM {{ .Endpoints }}
-        WHERE status_code<400
-        GROUP BY 
-            request_method,
-            path
-    )
-    SELECT
-        COUNT(*) AS total_endpoints,
-        COUNTIF(hit_count_yesterday>0) AS total_endpoints_yesterday,
-        SUM(hit_count_yesterday) AS hit_count_yesterday,
-    FROM base
+   {{ end }}
+   ```
 
-    {{ end }}
+   The query may contain parameters, like {{ .Base }}
+2. Add additional SQL queries to pass as arguments to the main query, for example:  
    ```
-   The query may contain parameters.
-2. Add additional SQL queries to pass as paramaters to the main query.  
-   These can be data files like [new_endpoints_input.sql](shot/queries/endpoints/new_endpoints_input.sql) or additional sub-queries like [get_new_endpoints.sql](shot/queries/endpoints/get_new_endpoints.sql)
-3. Write your result query like [report_summary_result.sql](shot/queries/endpoints/report_summary_result.sql):
-   ```
-   {{ define "report_summary_result" }}
+   {{ define "base" }}
 
-    (
-        SELECT
-            2 AS hit_count_yesterday,
-            1 AS total_endpoints,
-            1 AS total_endpoints_yesterday,
-    )
+   SELECT
+       "orange" AS fruit
+   UNION ALL
+   SELECT
+       "apple"
 
-    {{ end }}
+   {{ end }}
    ```
-    The test will expect the result of the test to be equal to this.
-4. Create a query definition file decribing your query and one or more tests like [report_summary.yaml](shot/queries/endpoints/report_summary.yaml):
+   
+3. Write your expected result query, for example:
    ```
-   Name: report_summary
+   {{ define "fruit_result" }}
+
+   SELECT
+       "orange" AS fruit
+   UNION ALL
+   SELECT
+       "apple"
+
+   {{ end }}
+   ```
+4. Create a query definition file describing your query and one or more tests, for example:
+   ```
+   Name: fruit
    Requires:
-   - Endpoints
+   - Base
    Tests:
      Test1:
        Args:
-       - Name: Endpoints
-         Source: get_new_endpoints
-         Args:
-         - Name: NewEndpoints
-           Source: new_endpoints_input
-       Result: 
-         Source: report_summary_result
-     TestHierarchical:
-       Args:
-       - Name: Endpoints
-         Source: get_new_endpoints
-       Result: 
-         Source: report_summary_result
+       - Name: Base
+         Source: base
+       Result:
+         Source: fruit_result
    ```
 5. Put all files together in a directory
 
@@ -100,12 +91,12 @@ Please set the following environment variables to grant espresso access to BigQu
 ## Running Tests From The Command-line
 ```
 go build
-./espresso -dir="./shot/queries/endpoints/" -query="report_summary" -test="Test1"
+./espresso -dir="./shot/queries/fruit/" -query="fruit" -test="Test1"
 ```
 
 ## Running Tests From Docker
 ```
-docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQUERY_KEY -v $(pwd)/shot:/shot:ro tufin/espresso -dir="/shot" -query="report_summary" -test="Test1"
+docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQUERY_KEY -v $(pwd)/shot:/shot:ro tufin/espresso -dir="/shot" -query="fruit" -test="Test1"
 ```
 
 ## Running Tests From Golang
@@ -113,11 +104,11 @@ docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQ
 2. Create an "Espresso Shot" and run it
 3. Use standard Go assertions to check the expected result against the actual output
 ```
-//go:embed queries/endpoints
-var endpointTemplates embed.FS
+//go:embed queries/fruit
+var templates embed.FS
 
 func TestEspressoShot_Embed(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
@@ -126,13 +117,13 @@ func TestEspressoShot_Embed(t *testing.T) {
 You can also pass the tests directory without embedding it:
 ```
 func TestEspressoShot_Filesystem(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/endpoints")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 ```
 
-## Running Tests In Other Languages
+## Running Tests In Other Programming Languages
 Currently only Go is supported.
 If you'd like to contribute additional language support, please start a dicssussion.
 

@@ -1,0 +1,9 @@
+Name: base_with_arg
+Requires:
+- Fruit
+Tests:
+  Hierarchical:
+    Args:
+    - Name: Fruit
+      Const: apple
+                

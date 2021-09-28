@@ -5,10 +5,31 @@ Tests:
   Test1:
     Args:
     - Name: Base
-      Const: base
+      Source: base
     Result:
-      Source: fruit
+      Source: fruit_result
+  Hierarchical:
+    Args:
+    - Name: Base
+      Source: base_with_arg
+    Result:
+      Source: fruit_result
+  HierarchicalInline:
+    Args:
+    - Name: Base
+      Source: base_with_arg
       Args:
-        - Name: Base
-          Const: base
-    
+      - Name: Fruit
+        Const: apple
+    Result:
+      Source: fruit_result
+  Mismatch:
+    Args:
+    - Name: Base
+      Source: base_with_arg
+      Args:
+      - Name: Fruit
+        Const: banana
+    Result:
+      Source: fruit_result
+                                        

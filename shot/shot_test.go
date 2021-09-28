@@ -13,35 +13,35 @@ import (
 	"github.com/tufin/espresso/shot"
 )
 
-//go:embed queries/endpoints
-var endpointTemplates embed.FS
+//go:embed queries/fruit
+var templates embed.FS
 
 func TestEspressoShot_Embed(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_Filesystem(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/endpoints")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
 func TestEspressoShot_FilesystemWithDepth(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./")).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
-func TestEspressoShot_HierarchicalTemplates(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "TestHierarchical", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+func TestEspressoShot_Hierarchical(t *testing.T) {
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Hierarchical", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
-func TestEspressoShot_Const(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+func TestEspressoShot_HierarchicalInline(t *testing.T) {
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "HierarchicalInline", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
@@ -57,8 +57,8 @@ func TestEspressoShot_StructValue(t *testing.T) {
 }
 
 func TestEspressoShot_InvalidRow(t *testing.T) {
-	badType := int(3)
-	_, _, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &badType)
+	var row int
+	_, _, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &row)
 	require.EqualError(t, err, "failed to iterate with bigquery: cannot convert *int to ValueLoader (need pointer to []Value, map[string]Value, or struct)")
 }
 
@@ -76,12 +76,12 @@ func TestGetQuery(t *testing.T) {
 	query, err := shot.NewShot(nil, "", "", os.DirFS("./queries/fruit")).GetQuery("fruit", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.Equal(t,
-		"\n\nWITH base AS (\n    SELECT\n        \"orange\" AS fruit\n    UNION ALL\n    SELECT\n        \"apple\"\n)\nSELECT\n    fruit\nFROM base\n\n",
+		"\n\nWITH base AS (\n    \n\nSELECT\n    \"orange\" AS fruit\nUNION ALL\nSELECT\n    \"apple\"\n\n\n)\nSELECT\n    fruit\nFROM base\n\n",
 		strings.ReplaceAll(query, "\r", ""))
 }
 
 func TestEspressoShot_Mismatch(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Mismatch", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Mismatch", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.Condition(t, func() bool {
 		return !reflect.DeepEqual(queryValues, resultValues)

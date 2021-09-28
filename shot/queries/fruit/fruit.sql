@@ -1,14 +1,10 @@
 {{ define "fruit" }}
 
 WITH base AS (
-    SELECT
-        "orange" AS fruit
-    UNION ALL
-    SELECT
-        "apple"
+    {{ .Base }}
 )
 SELECT
     fruit
-FROM {{ .Base }}
+FROM base
 
 {{ end }}

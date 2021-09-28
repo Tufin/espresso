@@ -1,8 +1,0 @@
-Name: get_new_endpoints
-Requires:
-- NewEndpoints
-Tests:
-  TestHierarchical:
-    Args:
-    - Name: NewEndpoints
-      Source: new_endpoints_input
