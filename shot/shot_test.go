@@ -3,6 +3,7 @@ package shot_test
 import (
 	"embed"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -55,6 +56,12 @@ func TestEspressoShot_StructValue(t *testing.T) {
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 
+func TestEspressoShot_InvalidRow(t *testing.T) {
+	badType := int(3)
+	_, _, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &badType)
+	require.EqualError(t, err, "failed to iterate with bigquery: cannot convert *int to ValueLoader (need pointer to []Value, map[string]Value, or struct)")
+}
+
 func TestEspressoShot_Invalid(t *testing.T) {
 	_, _, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/invalid")).RunTest("invalid", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.EqualError(t, err, "invalid template \"invalid\" due to invalid arg \"Base\" lacks source, const and table definitions")
@@ -73,8 +80,10 @@ func TestGetQuery(t *testing.T) {
 		strings.ReplaceAll(query, "\r", ""))
 }
 
-func TestEspressoShot_InvalidRow(t *testing.T) {
-	badType := int(3)
-	_, _, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Test1", []bigquery.QueryParameter{}, &badType)
-	require.EqualError(t, err, "failed to iterate with bigquery: cannot convert *int to ValueLoader (need pointer to []Value, map[string]Value, or struct)")
+func TestEspressoShot_Mismatch(t *testing.T) {
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", endpointTemplates).RunTest("report_summary", "Mismatch", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	require.NoError(t, err)
+	require.Condition(t, func() bool {
+		return !reflect.DeepEqual(queryValues, resultValues)
+	})
 }

@@ -11,6 +11,15 @@ Tests:
           Source: new_endpoints_input
     Result: 
       Source: report_summary_result
+  Mismatch:
+    Args:
+    - Name: Endpoints
+      Source: get_new_endpoints
+      Args:
+        - Name: NewEndpoints
+          Source: new_endpoints_input
+    Result: 
+      Source: report_summary_wrong_result
   TestHierarchical:
     Args:
     - Name: Endpoints
