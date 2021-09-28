@@ -9,7 +9,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tufin/espresso/env"
 	"github.com/tufin/espresso/shot"
-	"github.com/tufin/espresso/shot/bq"
 )
 
 var dir, query, test string
@@ -23,9 +22,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	fileSystem := os.DirFS(dir)
-	project := env.GetGCPProjectID()
-	queryValues, resultValues, err := shot.NewShot(bq.NewClient(project), project, "", fileSystem).RunTest(query, test, []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS(dir)).RunTest(query, test, []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)

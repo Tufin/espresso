@@ -22,7 +22,6 @@ type ClientImpl struct {
 	bqClient *bigquery.Client
 }
 
-// TODO: return error
 func NewClient(gcpProjectID string) Client {
 
 	if key := env.GetSensitive(EnvKeyBQToken); key != "" {
