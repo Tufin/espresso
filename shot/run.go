@@ -2,6 +2,7 @@ package shot
 
 import (
 	"fmt"
+	"reflect"
 
 	"cloud.google.com/go/bigquery"
 	log "github.com/sirupsen/logrus"
@@ -26,7 +27,9 @@ func readResult(queryIterator bq.Iterator, row interface{}) ([]interface{}, erro
 	result := []interface{}{}
 
 	for {
-		err := queryIterator.Next(row)
+		rowCopy := reflect.New(reflect.ValueOf(row).Elem().Type()).Interface()
+
+		err := queryIterator.Next(rowCopy)
 		if err != nil {
 			if err == iterator.Done {
 				break
@@ -34,7 +37,7 @@ func readResult(queryIterator bq.Iterator, row interface{}) ([]interface{}, erro
 			err = fmt.Errorf("failed to iterate with %v", err)
 			return nil, err
 		}
-		result = append(result, row)
+		result = append(result, rowCopy)
 	}
 	return result, nil
 }
