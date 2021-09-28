@@ -54,7 +54,7 @@
     {{ end }}
    ```
     The test will expect the result of the test to be equal to this.
-4. Create a query definition YAML file decribing your query and one or more tests like [report_summary.yaml](shot/queries/endpoints/report_summary.yaml):
+4. Create a query definition file decribing your query and one or more tests like [report_summary.yaml](shot/queries/endpoints/report_summary.yaml):
    ```
    Name: report_summary
    Requires:
@@ -76,10 +76,10 @@
        Result: 
          Source: report_summary_result
    ```
-1. Put all files together in a directory
+5. Put all files together in a directory
 
 ## Query Definitions
-Query definition file specifies one or more ways to construct an SQL query from a corresponding SQL template.  
+The query definition file specifies how to construct an SQL query from the SQL templates.  
 A definition file contains Tests, each specifying how to construct an SQL query and an optional expected result.  
 To create a query from its components, espresso looks for an SQL template with the same name as the definition file itself, and then interprets the Args.  
 Each Arg must have a name field that corresponds to an argument in the corresponding SQL template and one of the following fields:
