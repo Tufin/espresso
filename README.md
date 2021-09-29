@@ -15,7 +15,7 @@
 
 ## Writing Your Own SQL Tests
 1. Write an SQL query using Go Text Template notation, for example:
-   ```
+   ```sql
    {{ define "fruit" }}
  
    WITH base AS (
@@ -30,7 +30,7 @@
 
    The query may contain parameters, like {{ .Base }}
 2. Add additional SQL queries to pass as arguments to the main query, for example:  
-   ```
+   ```sql
    {{ define "base" }}
 
    SELECT
@@ -43,7 +43,7 @@
    ```
    
 3. Write your expected result query, for example:
-   ```
+   ```sql
    {{ define "fruit_result" }}
 
    SELECT
@@ -55,7 +55,7 @@
    {{ end }}
    ```
 4. Create a query definition file describing your query and one or more tests, for example:
-   ```
+   ```yaml
    Name: fruit
    Requires:
    - Base
@@ -89,13 +89,13 @@ Please set the following environment variables to grant espresso access to BigQu
 - `export BIGQUERY_KEY=<a service account with permissions to use BigQuery>`
 
 ## Running Tests From The Command-line
-```
+```bash
 go build
 ./espresso -dir="./shot/queries/fruit/" -query="fruit" -test="Test1"
 ```
 
 ## Running Tests From Docker
-```
+```bash
 docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQUERY_KEY -v $(pwd)/shot:/shot:ro tufin/espresso -dir="/shot" -query="fruit" -test="Test1"
 ```
 
@@ -103,7 +103,7 @@ docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQ
 1. Embed your tests directory
 2. Create an "Espresso Shot" and run it
 3. Use standard Go assertions to check the expected result against the actual output
-```
+```go
 func TestEspressoShot_Filesystem(t *testing.T) {
 	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
@@ -112,7 +112,7 @@ func TestEspressoShot_Filesystem(t *testing.T) {
 ```
 
 You can also embed the SQL templates directory into the code:
-```
+```go
 //go:embed queries/fruit
 var templates embed.FS
 
