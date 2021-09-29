@@ -94,6 +94,10 @@ func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryP
 		return nil, nil, err
 	}
 
+	if test.Result.Source == "" {
+		return nil, nil, fmt.Errorf("result source is missing")
+	}
+
 	resultValues, err := shot.loadAndRun(test.Result.Source, testName, test.Result.Args, params, row)
 	if err != nil {
 		return nil, nil, err

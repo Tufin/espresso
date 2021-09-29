@@ -32,4 +32,8 @@ Tests:
         Const: banana
     Result:
       Source: fruit_result
+  NoResult:
+    Args:
+    - Name: Base
+      Source: base
                                         

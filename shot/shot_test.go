@@ -87,3 +87,8 @@ func TestEspressoShot_Mismatch(t *testing.T) {
 		return !reflect.DeepEqual(queryValues, resultValues)
 	})
 }
+
+func TestEspressoShot_NoResult(t *testing.T) {
+	_, _, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "NoResult", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	require.EqualError(t, err, "result source is missing")
+}
