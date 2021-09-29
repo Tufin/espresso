@@ -104,20 +104,20 @@ docker run --rm -t -e GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID -e BIGQUERY_KEY=$BIGQ
 2. Create an "Espresso Shot" and run it
 3. Use standard Go assertions to check the expected result against the actual output
 ```
-//go:embed queries/fruit
-var templates embed.FS
-
-func TestEspressoShot_Embed(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+func TestEspressoShot_Filesystem(t *testing.T) {
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
 ```
 
-You can also pass the tests directory without embedding it:
+You can also embed the SQL templates directory into the code:
 ```
-func TestEspressoShot_Filesystem(t *testing.T) {
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS("./queries/fruit")).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+//go:embed queries/fruit
+var templates embed.FS
+
+func TestEspressoShot_Embed(t *testing.T) {
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Test1", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, queryValues, resultValues)
 }
