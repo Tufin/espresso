@@ -94,7 +94,6 @@ func TestEspressoShot_NoResult(t *testing.T) {
 }
 
 func TestEspressoShot_RunTest(t *testing.T) {
-	env.Ophiuchus()
 	empty, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.True(t, empty)
