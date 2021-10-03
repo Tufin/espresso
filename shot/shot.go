@@ -67,7 +67,7 @@ func (shot Shot) RunQuery(query string, testName string, params []bigquery.Query
 }
 
 /*
-GetTestResults performs a test by running two SQL queries: 
+GetTestResults performs a test by running two SQL queries:
 Query 1: The test query
 Query 2: The exptected result query
 query is the name of the query. There must be a correponding yaml definition file and an SQL template in the filesystem.
@@ -111,7 +111,7 @@ func (shot Shot) GetTestResults(query string, testName string, params []bigquery
 /*
 RunTest performs a test by running a combined query and checking that the result is empty:
 "The test query"
-EXCEPT DISTINCT 
+EXCEPT DISTINCT
 "The exptected result query"
 
 query is the name of the query. There must be a correponding yaml definition file and an SQL template in the filesystem.
