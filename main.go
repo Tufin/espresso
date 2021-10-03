@@ -22,7 +22,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS(dir)).RunTest(query, test, []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
+	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", os.DirFS(dir)).GetTestResults(query, test, []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)

@@ -67,14 +67,16 @@ func (shot Shot) RunQuery(query string, testName string, params []bigquery.Query
 }
 
 /*
-RunTest performs a test by running two SQL queries: one for the test itself and another for the exptected result
+GetTestResults performs a test by running two SQL queries: 
+Query 1: The test query
+Query 2: The exptected result query
 query is the name of the query. There must be a correponding yaml definition file and an SQL template in the filesystem.
 testName is the name of the test to run, it must appear in the yaml definition file
 params are BigQuery paramaters
 row is a variable of type to be read from the table (must adhere to https://pkg.go.dev/cloud.google.com/go/bigquery#RowIterator.Next requirements)
-The result will be a slice of the same type of 'row' with the result of the query
+The results will be two slices of the same type of 'row' with the result of each query (test and result)
 */
-func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryParameter, row interface{}) (interface{}, interface{}, error) {
+func (shot Shot) GetTestResults(query string, testName string, params []bigquery.QueryParameter, row interface{}) (interface{}, interface{}, error) {
 
 	metadata, err := getMetadata(shot.fsys, query)
 	if err != nil {
@@ -104,6 +106,58 @@ func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryP
 	}
 
 	return queryValues, resultValues, nil
+}
+
+/*
+RunTest performs a test by running a combined query and checking that the result is empty:
+"The test query"
+EXCEPT DISTINCT 
+"The exptected result query"
+
+query is the name of the query. There must be a correponding yaml definition file and an SQL template in the filesystem.
+testName is the name of the test to run, it must appear in the yaml definition file
+params are BigQuery paramaters
+The result will true iff the result is empty
+*/
+func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryParameter) (bool, error) {
+	metadata, err := getMetadata(shot.fsys, query)
+	if err != nil {
+		log.Errorf("failed to get metadata with %v", err)
+		return false, err
+	}
+
+	test, ok := metadata.Tests[testName]
+	if !ok {
+		err := fmt.Errorf("test %q undefined", testName)
+		log.Error(err)
+		return false, err
+	}
+
+	testQuery, err := shot.getQuery(metadata.Name, testName, test.Args)
+	if err != nil {
+		return false, err
+	}
+
+	if test.Result.Source == "" {
+		return false, fmt.Errorf("result source is missing")
+	}
+
+	resultQuery, err := shot.getQuery(test.Result.Source, testName, test.Result.Args)
+	if err != nil {
+		return false, err
+	}
+
+	queryIterator, err := runQuery(shot.bqClient, testQuery+"\nEXCEPT DISTINCT\n("+resultQuery+"\n)", params)
+	if err != nil {
+		return false, err
+	}
+
+	result, err := readResult(queryIterator, &map[string]bigquery.Value{})
+	if err != nil {
+		return false, err
+	}
+
+	return len(result) == 0, nil
 }
 
 /*
