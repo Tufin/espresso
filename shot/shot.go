@@ -1,6 +1,7 @@
 package shot
 
 import (
+	"embed"
 	"fmt"
 	"io/fs"
 
@@ -108,11 +109,12 @@ func (shot Shot) GetTestResults(query string, testName string, params []bigquery
 	return queryValues, resultValues, nil
 }
 
+//go:embed queries/diff
+var diffFS embed.FS
+
 /*
-RunTest performs a test by running a combined query and checking that the result is empty:
-"The test query"
-EXCEPT DISTINCT
-"The exptected result query"
+GetTestResults performs a test by running a single [SQL query](queries/diff/diff.sql)
+Note that due it doesn't detect differences if tables have duplicate rows.
 
 query is the name of the query. There must be a correponding yaml definition file and an SQL template in the filesystem.
 testName is the name of the test to run, it must appear in the yaml definition file
@@ -147,7 +149,15 @@ func (shot Shot) RunTest(query string, testName string, params []bigquery.QueryP
 		return false, err
 	}
 
-	queryIterator, err := runQuery(shot.bqClient, testQuery+"\nEXCEPT DISTINCT\n("+resultQuery+"\n)", params)
+	diffQuery, err := generateSQL(diffFS, "diff", map[string]string{
+		"Table1": testQuery,
+		"Table2": resultQuery,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	queryIterator, err := runQuery(shot.bqClient, diffQuery, params)
 	if err != nil {
 		return false, err
 	}
