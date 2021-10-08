@@ -94,21 +94,18 @@ func TestGetTestResults_NoResult(t *testing.T) {
 }
 
 func TestRunTest_Identical(t *testing.T) {
-	env.Ophiuchus()
 	empty, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Test1", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.True(t, empty)
 }
 
 func TestRunTest_Mismatch(t *testing.T) {
-	env.Ophiuchus()
 	empty, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Mismatch", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	require.False(t, empty)
 }
 
 func TestRunTest_Duplicates(t *testing.T) {
-	env.Ophiuchus()
 	empty, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Duplicates", []bigquery.QueryParameter{})
 	require.NoError(t, err)
 	// TODO: this test should fail because the results are not equal
@@ -116,7 +113,6 @@ func TestRunTest_Duplicates(t *testing.T) {
 }
 
 func TestGetTestResults_Duplicates(t *testing.T) {
-	env.Ophiuchus()
 	queryValues, resultValues, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).GetTestResults("fruit", "Duplicates", []bigquery.QueryParameter{}, &map[string]bigquery.Value{})
 	require.NoError(t, err)
 
