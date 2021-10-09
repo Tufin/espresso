@@ -72,15 +72,17 @@
 ## Query Definitions
 The query definition file specifies how to construct an SQL query from the SQL templates.  
 A definition file contains Tests, each specifying how to construct an SQL query and an optional expected result.  
-To create a query from its components, espresso looks for an SQL template with the same name as the definition file itself, and then interprets the Args.  
-Each Arg must have a name field that corresponds to an argument in the corresponding SQL template and one of the following fields:
-1. Source - Another SQL template which will be parsed and injected into the containing query.
+To create a query from its components, espresso looks for an SQL template with the same name as the definition file itself, and then executes it with the given Args.  
+Each Arg must have a Name field that corresponds to a required argument in the SQL template and one of the following fields:
+1. Source - Another SQL template which will be executed and injected into the containing query.
 2. Table - a table name which will be combined with the Google project and BigQuery dataset (defined in Shot) and injected into the containing query.
 3. Const - a string that will be injected into the containing query.
 
-Source may contain its own args, or, if it doesn't, espresso will look for a corresponding template file with a test of the same name and parse the args from there.
+Source may contain its own Args. If it doesn't, espresso will look for a corresponding template file with a test of the same name and parse the args from there.
 
-Result has the same semantics as an Arg, except it has no Name field.
+Result is an optional field specifiying the test's expected result.
+It should have a Source field specifying an SQL template that will be executed to generate the expected result query.
+Source may contain Args as described above.
 
 ## Access To BigQuery
 The tests require access to BigQuery API. 
