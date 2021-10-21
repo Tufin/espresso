@@ -108,7 +108,7 @@ func TestRunTest_Mismatch(t *testing.T) {
 func TestRunTest_Duplicates(t *testing.T) {
 	empty, err := shot.NewShotWithClient(env.GetGCPProjectID(), "", templates).RunTest("fruit", "Duplicates", []bigquery.QueryParameter{})
 	require.NoError(t, err)
-	// TODO: this test should fail because the results are not equal
+	// TODO: this test should fail because the results are not equal (see RunTest limitation)
 	require.True(t, empty)
 }
 

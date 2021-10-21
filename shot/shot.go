@@ -113,8 +113,8 @@ func (shot Shot) GetTestResults(query string, testName string, params []bigquery
 var diffFS embed.FS
 
 /*
-GetTestResults performs a test by running a single [SQL query](queries/diff/diff.sql)
-Note that due it doesn't detect differences if tables have duplicate rows.
+RunTest performs a test by running a single [SQL query](queries/diff/diff.sql)
+Limitation: 'EXCEPT DISTINCT' doesn't detect differences if tables have duplicate rows.
 
 query is the name of the query. There must be a correponding yaml definition file and an SQL template in the filesystem.
 testName is the name of the test to run, it must appear in the yaml definition file
