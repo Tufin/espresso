@@ -13,7 +13,6 @@ import (
 type metadata struct {
 	Name     string          `yaml:"Name"`
 	Requires []string        `yaml:"Requires"`
-	Params   []string        `yaml:"Params"`
 	Tests    map[string]test `yaml:"Tests"`
 }
 
